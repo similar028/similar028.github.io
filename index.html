@@ -1,0 +1,870 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8" />
+  
+  <title>lazy</title>
+  <meta name="author" content="lazy" />
+
+  
+
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+
+  
+  <meta property="og:site_name" content="lazy" />
+
+  
+  
+  
+  
+  
+
+  
+    <meta property="og:image" content="undefined" />
+  
+
+  
+  <link href="/css/images/favicon.ico" rel="icon" />
+  
+
+  <link rel="alternate" href="/atom.xml" title="lazy" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+
+  <!-- baidu webmaster push -->
+  <script src='//push.zhanzhang.baidu.com/push.js'></script>
+
+</head>
+
+
+<body>
+  <header id="header" class="inner"><div class="alignleft">
+  <h1><a href="/">lazy</a></h1>
+  <h2><a href="/"></a></h2>
+</div>
+<nav id="main-nav" class="alignright">
+  <ul>
+    
+      <li><a href="/">主页</a></li>
+    
+      <li><a href="/achieve">所有文章</a></li>
+    
+      <li><a href="/plan">学习计划</a></li>
+    
+      <li><a href="/developer">开发者</a></li>
+    
+      <li><a href="/about">关于</a></li>
+    
+      <li><a href="http://www.cnblogs.com/lazy0">aother blog</a></li>
+    
+  </ul>
+  <div class="clearfix"></div>
+</nav>
+<div class="clearfix"></div></header>
+  <div id="content" class="inner">
+    <div id="main-col" class="alignleft"><div id="wrapper">
+  <article class="post">
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2016-06-10T14:26:00.000Z"><a href="/2016/06/10/python_端口扫描小工具/">2016-06-10</a></time>
+      
+      
+  
+    <h1 class="title"><a href="/2016/06/10/python_端口扫描小工具/">python_端口扫描小工具</a></h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <p>端口扫描小工具</p>
+<h3 id="port-ip-py"><a href="#port-ip-py" class="headerlink" title="port_ip.py"></a>port_ip.py</h3><pre><code>#!usr/bin/env python 
+#-*- coding:utf_8 -*-
+import urllib
+import socket
+ip=&apos;192.168.16.136&apos;
+default_ports=[80,21,22,3389,1433]
+def port_scan(ip,port):
+    try:
+        socket.setdefaulttimeout(3)
+        s=socket.socket()
+        s.connect((ip,port))
+        print &apos;[+] port:%d\t open&apos;%port
+        s.close()#关闭套接字
+    except:
+        pass
+if __name__ == &apos;__main__&apos;:
+    for port in default_ports:
+        port_scan(ip,port)
+</code></pre><p>结果：</p>
+<pre><code>[+] port:80     open
+</code></pre><h3 id="port-ip-2-py"><a href="#port-ip-2-py" class="headerlink" title="port_ip_2.py"></a>port_ip_2.py</h3><pre><code>#!usr/bin/env python 
+#-*- coding:utf_8 -*-
+import urllib
+import socket
+ip=&apos;192.168.16.136&apos;
+default_ports=[80,21,22,3389,1433]
+def port_scan(ip,port):
+    try:
+        socket.setdefaulttimeout(3)
+        s=socket.socket()
+        s.connect((ip,port))
+        print &apos;[+] port:%d\t open \t%s&apos;%(port,socket.getservbyport(port))
+        s.close()#关闭套接字
+    except:
+        pass
+if __name__ == &apos;__main__&apos;:
+    for port in default_ports:
+        port_scan(ip,port)
+</code></pre><p>结果：</p>
+<pre><code>[+] port:80     open     http
+</code></pre><p>####程序分析：</p>
+<pre><code>getservbyport(port)函数，获取对应端口所运行的的服务
+
+map()函数的用法：
+
+    map(f, iterable) 基本上等于：[f(x) for x in iterable]
+
+map()函数案例
+
+    &gt;&gt;&gt; def add100(x):
+    ...     return x + 100
+    ... 
+    &gt;&gt;&gt; list1 = [11,22,33]
+    &gt;&gt;&gt; map(add100,list1)
+    [101, 102, 103]
+
+    &gt;&gt;&gt; [add100(i) for i in list1]
+    [101, 102, 103]
+</code></pre><h3 id="port-3-py"><a href="#port-3-py" class="headerlink" title="port_3.py"></a>port_3.py</h3><pre><code>import urllib
+import socket
+ip=&apos;192.168.16.136&apos;
+default_ports=[80,21,22,3389,1433]
+def port_scan(ip,port):
+    try:
+        socket.setdefaulttimeout(3)
+        s=socket.socket()
+        s.connect((ip,port))
+        s.send(&apos;aaa\r\n&apos;)
+        res=s.recv(40)
+        print &apos;[+] port:%d\t open \t%s&apos;%(port,res)
+        s.close()#关闭套接字
+    except:
+        pass
+if __name__ == &apos;__main__&apos;:
+    map(port_scan,[ip]*len(default_ports),default_ports)
+</code></pre><p>结果：</p>
+<pre><code>[+] port:80     open     &lt;?xml version=&quot;1.0&quot; encoding=&quot;iso-8859-1
+</code></pre><p>发送数据，并且接收到一些数据，</p>
+<h3 id="port-4-py"><a href="#port-4-py" class="headerlink" title="port_4.py"></a>port_4.py</h3><pre><code>#!usr/bin/env python 
+#-*- coding:utf_8 -*-
+import urllib
+
+import socket,threading
+ip=&apos;192.168.16.136&apos;
+default_ports=[21,22,80,1433,3306]
+
+lock=threading.Semaphore(value=1)
+def port_scan(ip,port):
+    try:
+        socket.setdefaulttimeout(3)
+        s=socket.socket()
+        s.connect((ip,port))
+        s.send(&apos;dream9\r\n&apos;)
+        res=s.recv(40)
+        lock.acquire()
+        print &apos;[+] port:%d\topen\t%s&apos; % (port,res)
+        lock.release()
+        s.close()
+    except:
+        pass
+
+if __name__==&apos;__main__&apos;:
+    for port in default_ports:
+        t=threading.Thread(target=port_scan,args=(ip,port))
+        t.start()
+</code></pre><p>####程序分析：</p>
+<pre><code>lock=threading.Semaphore(value=1)
+</code></pre><p>信号机semaphore()每次有一个线程获取信号机，计数器为-1，如果为0，则其他线程就体制访问信号机，直到开始那个哪个线程释放信号机</p>
+<pre><code>lock.acquire(): 调用acquire()时-1
+
+lock.release(): 释放Semaphore，将计数器+1
+
+thread.exit(）线程结束
+</code></pre><p>详细请见：<a href="https://www.t00ls.net/thread-32735-1-1.html" target="_blank" rel="external">Hacking By Python—端口扫描1</a></p>
+
+      
+    </div>
+    
+    <footer>
+        <div class="alignright">
+          
+          <a href='javascript:void(0)' class="share-link bdsharebuttonbox" data-cmd="more">分享</a>
+        </div>
+        
+  
+  <div class="categories">
+    <a href="/categories/python/">python</a>
+  </div>
+
+        
+  
+  <div class="tags">
+    <a href="/tags/python/">python</a>, <a href="/tags/脚本/">脚本</a>
+  </div>
+
+        <!-- partial('post/share') -->
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+
+
+  <article class="post">
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2016-06-07T15:26:36.000Z"><a href="/2016/06/07/phpcms_2008远程代码执行漏洞/">2016-06-07</a></time>
+      
+      
+  
+    <h1 class="title"><a href="/2016/06/07/phpcms_2008远程代码执行漏洞/">phpcms-2008 远程代码执行漏洞</a></h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <p>phpcms—2008 中 string2array()函数使用了eval函数,在多个地方可能造成代码执行漏洞.<br>
+      
+    </div>
+    
+    <footer>
+      <div class="alignleft">
+        <a href="/2016/06/07/phpcms_2008远程代码执行漏洞/#more" class="more-link">More</a>
+      </div>
+    </footer>
+    
+    <footer>
+        <div class="alignright">
+          
+          <a href='javascript:void(0)' class="share-link bdsharebuttonbox" data-cmd="more">分享</a>
+        </div>
+        
+  
+  <div class="categories">
+    <a href="/categories/渗透测试/">渗透测试</a>
+  </div>
+
+        
+  
+  <div class="tags">
+    <a href="/tags/渗透测试，命令执行/">渗透测试，命令执行</a>
+  </div>
+
+        <!-- partial('post/share') -->
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+
+
+  <article class="post">
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2016-05-30T14:26:00.000Z"><a href="/2016/05/30/python_json模块/">2016-05-30</a></time>
+      
+      
+  
+    <h1 class="title"><a href="/2016/05/30/python_json模块/">python之json模块</a></h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <p>JSON（JavaScript Object Notation）：一种轻量级数据交换格式，相对于XML而言更简单，也易于阅读和编写，机器也方便解析和生成，Json是JavaScript中的一个子集。<br>
+      
+    </div>
+    
+    <footer>
+      <div class="alignleft">
+        <a href="/2016/05/30/python_json模块/#more" class="more-link">More</a>
+      </div>
+    </footer>
+    
+    <footer>
+        <div class="alignright">
+          
+          <a href='javascript:void(0)' class="share-link bdsharebuttonbox" data-cmd="more">分享</a>
+        </div>
+        
+  
+  <div class="categories">
+    <a href="/categories/python/">python</a>
+  </div>
+
+        
+  
+  <div class="tags">
+    <a href="/tags/python/">python</a>, <a href="/tags/json/">json</a>
+  </div>
+
+        <!-- partial('post/share') -->
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+
+
+  <article class="post">
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2016-05-27T13:26:36.000Z"><a href="/2016/05/27/python正则表达式/">2016-05-27</a></time>
+      
+      
+  
+    <h1 class="title"><a href="/2016/05/27/python正则表达式/">python之正则表达式</a></h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <p>我们已经搞定了怎样获取页面的内容，不过还差一步，这么多杂乱的代码夹杂文字我们怎样把它提取出来整理呢？下面就开始介绍一个十分强大的工具，正则表达式！</p>
+      
+    </div>
+    
+    <footer>
+      <div class="alignleft">
+        <a href="/2016/05/27/python正则表达式/#more" class="more-link">More</a>
+      </div>
+    </footer>
+    
+    <footer>
+        <div class="alignright">
+          
+          <a href='javascript:void(0)' class="share-link bdsharebuttonbox" data-cmd="more">分享</a>
+        </div>
+        
+  
+  <div class="categories">
+    <a href="/categories/python/">python</a>
+  </div>
+
+        
+  
+  <div class="tags">
+    <a href="/tags/python/">python</a>, <a href="/tags/正则表达式/">正则表达式</a>
+  </div>
+
+        <!-- partial('post/share') -->
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+
+
+  <article class="post">
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2016-04-28T13:26:36.000Z"><a href="/2016/04/28/十大漏洞之远程命令执行/">2016-04-28</a></time>
+      
+      
+  
+    <h1 class="title"><a href="/2016/04/28/十大漏洞之远程命令执行/">十大漏洞之命令执行</a></h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <p>可以用`&amp;&amp;’，’||’，’|’，’&amp;’等来执行其它命令。当输入的参数有双引号时，如果引号没有被转义，我们可以先闭合引号。当是单引号时，需要先闭合单引号才能执行。</p>
+      
+    </div>
+    
+    <footer>
+      <div class="alignleft">
+        <a href="/2016/04/28/十大漏洞之远程命令执行/#more" class="more-link">More</a>
+      </div>
+    </footer>
+    
+    <footer>
+        <div class="alignright">
+          
+          <a href='javascript:void(0)' class="share-link bdsharebuttonbox" data-cmd="more">分享</a>
+        </div>
+        
+  
+  <div class="categories">
+    <a href="/categories/十大漏洞/">十大漏洞</a>
+  </div>
+
+        
+  
+  <div class="tags">
+    <a href="/tags/上传绕过/">上传绕过</a>, <a href="/tags/渗透测试/">渗透测试</a>
+  </div>
+
+        <!-- partial('post/share') -->
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+
+
+  <article class="post">
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2016-04-27T13:26:36.000Z"><a href="/2016/04/27/十大漏洞之文件上传/">2016-04-27</a></time>
+      
+      
+  
+    <h1 class="title"><a href="/2016/04/27/十大漏洞之文件上传/">十大漏洞之文件上传</a></h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <p>文件上传，每个网站都存在的一个切入点，但是，同时也是经常出现纰漏的地方，以为这个纰漏，可以会给站点带来不可想象的攻击。<br>
+      
+    </div>
+    
+    <footer>
+      <div class="alignleft">
+        <a href="/2016/04/27/十大漏洞之文件上传/#more" class="more-link">More</a>
+      </div>
+    </footer>
+    
+    <footer>
+        <div class="alignright">
+          
+          <a href='javascript:void(0)' class="share-link bdsharebuttonbox" data-cmd="more">分享</a>
+        </div>
+        
+  
+  <div class="categories">
+    <a href="/categories/十大漏洞/">十大漏洞</a>
+  </div>
+
+        
+  
+  <div class="tags">
+    <a href="/tags/上传绕过/">上传绕过</a>, <a href="/tags/渗透测试/">渗透测试</a>
+  </div>
+
+        <!-- partial('post/share') -->
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+
+
+  <article class="post">
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2016-04-19T16:26:36.000Z"><a href="/2016/04/20/十大漏洞之CSRF/">2016-04-20</a></time>
+      
+      
+  
+    <h1 class="title"><a href="/2016/04/20/十大漏洞之CSRF/">十大漏洞之CSRF</a></h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <p>CSRF(Cross-Site Request Forgery,跨站伪造请求)是一种网络攻击方式，在受害者不知道的情况下，伪造受害者请求发送攻击站点，从而在未授权的情况下，执行操作。<br>
+      
+    </div>
+    
+    <footer>
+      <div class="alignleft">
+        <a href="/2016/04/20/十大漏洞之CSRF/#more" class="more-link">More</a>
+      </div>
+    </footer>
+    
+    <footer>
+        <div class="alignright">
+          
+          <a href='javascript:void(0)' class="share-link bdsharebuttonbox" data-cmd="more">分享</a>
+        </div>
+        
+  
+  <div class="categories">
+    <a href="/categories/十大漏洞/">十大漏洞</a>
+  </div>
+
+        
+  
+  <div class="tags">
+    <a href="/tags/CSRF/">CSRF</a>
+  </div>
+
+        <!-- partial('post/share') -->
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+
+
+  <article class="post">
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2015-06-19T17:20:36.000Z"><a href="/2015/06/20/那些年我们绕过的waf/">2015-06-20</a></time>
+      
+      
+  
+    <h1 class="title"><a href="/2015/06/20/那些年我们绕过的waf/">那些年我们绕过的waf</a></h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <p>当我们注入的时候，发现有狗，有waf,真的是我的小心脏都碎掉了！！但是呢，很多时候还是得静下来分析过滤系统到底过滤了哪些参数，该如何绕过。手工测试测试吧！！
+      
+    </div>
+    
+    <footer>
+      <div class="alignleft">
+        <a href="/2015/06/20/那些年我们绕过的waf/#more" class="more-link">More</a>
+      </div>
+    </footer>
+    
+    <footer>
+        <div class="alignright">
+          
+          <a href='javascript:void(0)' class="share-link bdsharebuttonbox" data-cmd="more">分享</a>
+        </div>
+        
+  
+  <div class="categories">
+    <a href="/categories/渗透测试/">渗透测试</a>
+  </div>
+
+        
+  
+  <div class="tags">
+    <a href="/tags/sql注入，手工/">sql注入，手工</a>, <a href="/tags/过waf，过狗/">过waf，过狗</a>
+  </div>
+
+        <!-- partial('post/share') -->
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+
+
+  <article class="post">
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2015-06-19T16:26:36.000Z"><a href="/2015/06/20/sql注入之tamper绕过WAF，安全狗/">2015-06-20</a></time>
+      
+      
+  
+    <h1 class="title"><a href="/2015/06/20/sql注入之tamper绕过WAF，安全狗/">sql注入之tamper绕过WAF，安全狗</a></h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <p>当我们注入的时候，发现有狗，有waf,真的是我的小心脏都碎掉了！！但是呢，很多时候还是得静下来分析过滤系统到底过滤了哪些参数，该如何绕过。利用sqlmap中的tamper给我们带来了很多防过滤的脚本绕过。
+      
+    </div>
+    
+    <footer>
+      <div class="alignleft">
+        <a href="/2015/06/20/sql注入之tamper绕过WAF，安全狗/#more" class="more-link">More</a>
+      </div>
+    </footer>
+    
+    <footer>
+        <div class="alignright">
+          
+          <a href='javascript:void(0)' class="share-link bdsharebuttonbox" data-cmd="more">分享</a>
+        </div>
+        
+  
+  <div class="categories">
+    <a href="/categories/渗透测试/">渗透测试</a>
+  </div>
+
+        
+  
+  <div class="tags">
+    <a href="/tags/sql注入，过狗，过waf/">sql注入，过狗，过waf</a>
+  </div>
+
+        <!-- partial('post/share') -->
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+
+
+  <article class="post">
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2015-05-21T13:26:36.000Z"><a href="/2015/05/21/hexos添加访问量统计模块/">2015-05-21</a></time>
+      
+      
+  
+    <h1 class="title"><a href="/2015/05/21/hexos添加访问量统计模块/">hexos添加访问量统计模块</a></h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <p>普通用户只需两步走：一行脚本+一行标签，搞定一切。追求极致的用户可以进行任意DIY。<br>
+      
+    </div>
+    
+    <footer>
+      <div class="alignleft">
+        <a href="/2015/05/21/hexos添加访问量统计模块/#more" class="more-link">More</a>
+      </div>
+    </footer>
+    
+    <footer>
+        <div class="alignright">
+          
+          <a href='javascript:void(0)' class="share-link bdsharebuttonbox" data-cmd="more">分享</a>
+        </div>
+        
+  
+  <div class="categories">
+    <a href="/categories/杂谈/">杂谈</a>
+  </div>
+
+        
+  
+  <div class="tags">
+    <a href="/tags/hexo/">hexo</a>
+  </div>
+
+        <!-- partial('post/share') -->
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+
+
+
+<nav id="pagination">
+  
+  <nav id="page-nav">
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/">Siguiente &raquo;</a>
+  </nav>
+
+</nav>
+</div></div>
+    <aside id="sidebar" class="alignright">
+  <div class="widget tag">
+    <h3 class="title">关于文章</h3>
+    <div class="entry">
+    <P>文章有问题可以发邮件</p>
+    <p>大家彼此相互学习</p>
+      <p>邮箱：lazy@dropsec.xyz</p>
+    </div>
+</div>
+
+  <div class="widget tag">
+    <h3 class="title">赞助我</h3>
+    <div class="entry">
+      <img src='/css/images/qr_alipay.png' style='width:100%;background:rgba(255,255,255,0.6)' />
+    </div>
+</div>
+
+  
+<div class="widget tagcloud">
+  <h3 class="title">标签云</h3>
+  <div class="entry">
+    <a href="/tags/CSRF/" style="font-size: 10px;">CSRF</a> <a href="/tags/MarkDown/" style="font-size: 10px;">MarkDown</a> <a href="/tags/hexo/" style="font-size: 20px;">hexo</a> <a href="/tags/json/" style="font-size: 10px;">json</a> <a href="/tags/python/" style="font-size: 20px;">python</a> <a href="/tags/sql注入，手工/" style="font-size: 10px;">sql注入，手工</a> <a href="/tags/sql注入，过狗，过waf/" style="font-size: 10px;">sql注入，过狗，过waf</a> <a href="/tags/上传绕过/" style="font-size: 15px;">上传绕过</a> <a href="/tags/正则表达式/" style="font-size: 10px;">正则表达式</a> <a href="/tags/渗透测试/" style="font-size: 15px;">渗透测试</a> <a href="/tags/渗透测试，命令执行/" style="font-size: 10px;">渗透测试，命令执行</a> <a href="/tags/脚本/" style="font-size: 10px;">脚本</a> <a href="/tags/过waf，过狗/" style="font-size: 10px;">过waf，过狗</a>
+  </div>
+</div>
+
+
+  
+  <div class="widget tag">
+    <h3 class="title">归档</h3>
+    <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archive/2016/06/">    2016年06月</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archive/2016/05/">    2016年05月</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archive/2016/04/">    2016年04月</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archive/2015/06/">    2015年06月</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archive/2015/05/">    2015年05月</a><span class="archive-list-count">4</span></li></ul>
+  </div>
+
+
+  
+<div class="widget tag">
+  <h3 class="title">分类</h3>
+  <ul class="entry">
+  
+    <li><a href="/categories/python/">python</a><small>3</small></li>
+  
+    <li><a href="/categories/十大漏洞/">十大漏洞</a><small>3</small></li>
+  
+    <li><a href="/categories/杂谈/">杂谈</a><small>4</small></li>
+  
+    <li><a href="/categories/渗透测试/">渗透测试</a><small>3</small></li>
+  
+  </ul>
+</div>
+
+
+  
+<div class="widget tag">
+  <h3 class="title">近期文章</h3>
+  <ul class="entry">
+    
+      <li>
+        <a href="/2016/06/10/python_端口扫描小工具/">python_端口扫描小工具</a>
+      </li>
+    
+      <li>
+        <a href="/2016/06/07/phpcms_2008远程代码执行漏洞/">phpcms-2008 远程代码执行漏洞</a>
+      </li>
+    
+      <li>
+        <a href="/2016/05/30/python_json模块/">python之json模块</a>
+      </li>
+    
+      <li>
+        <a href="/2016/05/27/python正则表达式/">python之正则表达式</a>
+      </li>
+    
+      <li>
+        <a href="/2016/04/28/十大漏洞之远程命令执行/">十大漏洞之命令执行</a>
+      </li>
+    
+  </ul>
+</div>
+
+
+  <div class="widget tag">
+  <h3 class="title">友情链接</h3>
+  <div class="entry">
+    <ul>
+<!-- link start -->
+<li><a href='http://www.cnblogs.com/lazy0'>lazy</a></li>
+<li><a href='http://www.baidu.com'>baidu</a></li>
+<!-- link  end -->
+    </ul>
+  </div>
+</div>
+
+
+  <div class="widget tag">
+    <h3 class="title">统计</h3>
+    <div class="entry">
+      
+	<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1260064002'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s4.cnzz.com/z_stat.php%3Fid%3D1260064002' type='text/javascript'%3E%3C/script%3E"));</script>
+
+
+
+
+    </div>
+</div>
+
+</aside>
+    <div class="clearfix"></div>
+  </div>
+  <footer id="footer" class="inner"><script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+<div class="alignleft">
+<span id="busuanzi_container_site_pv">
+    你好，你是第:<span id="busuanzi_value_site_pv"></span>位访客
+</span>
+</div>
+
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1260064002'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s4.cnzz.com/z_stat.php%3Fid%3D1260064002' type='text/javascript'%3E%3C/script%3E"));</script>
+
+
+
+</footer>
+  <script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+
+
+<script>
+    //Kill XP and IE8
+    (function(){
+        var ua = navigator.userAgent;
+        var res = /Windows NT (\d+\.\d+)/.exec(ua);
+        var xpOrLower = res && JSON.parse(res[1]) < 6;
+        res = /MSIE (\d+\.\d+)/.exec(ua);
+        var ie8OrLower = res && JSON.parse(res[1]) < 9;
+        if(xpOrLower || ie8OrLower)
+        {
+            alert('请不要用XP及之前的Windows系统，和IE8及之前的IE浏览器访问本站！');
+            location.href = "about:blank";
+        }
+        var fromBaiduSE = /^https?:\/\/www.baidu.com/.test(document.referrer);
+        if(fromBaiduSE)
+        {
+            alert('检测到你还在使用百度搜索，作为一个程序员，这是一种自暴自弃！\n\n做不作恶的程序员，从不用百度开始！')
+            location.href = "about:blank";
+        }
+    })();
+</script>
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1260064002'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s4.cnzz.com/z_stat.php%3Fid%3D1260064002' type='text/javascript'%3E%3C/script%3E"));</script> 
+//前面要添加的代码  
+//百度统计的代码  
+
+<div id='bg'></div>
+</body>
+</html>
