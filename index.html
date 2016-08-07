@@ -83,123 +83,14 @@
     <div class="entry">
       
         <p>端口扫描小工具</p>
-<h3 id="port-ip-py"><a href="#port-ip-py" class="headerlink" title="port_ip.py"></a>port_ip.py</h3><pre><code>#!usr/bin/env python 
-#-*- coding:utf_8 -*-
-import urllib
-import socket
-ip=&apos;192.168.16.136&apos;
-default_ports=[80,21,22,3389,1433]
-def port_scan(ip,port):
-    try:
-        socket.setdefaulttimeout(3)
-        s=socket.socket()
-        s.connect((ip,port))
-        print &apos;[+] port:%d\t open&apos;%port
-        s.close()#关闭套接字
-    except:
-        pass
-if __name__ == &apos;__main__&apos;:
-    for port in default_ports:
-        port_scan(ip,port)
-</code></pre><p>结果：</p>
-<pre><code>[+] port:80     open
-</code></pre><h3 id="port-ip-2-py"><a href="#port-ip-2-py" class="headerlink" title="port_ip_2.py"></a>port_ip_2.py</h3><pre><code>#!usr/bin/env python 
-#-*- coding:utf_8 -*-
-import urllib
-import socket
-ip=&apos;192.168.16.136&apos;
-default_ports=[80,21,22,3389,1433]
-def port_scan(ip,port):
-    try:
-        socket.setdefaulttimeout(3)
-        s=socket.socket()
-        s.connect((ip,port))
-        print &apos;[+] port:%d\t open \t%s&apos;%(port,socket.getservbyport(port))
-        s.close()#关闭套接字
-    except:
-        pass
-if __name__ == &apos;__main__&apos;:
-    for port in default_ports:
-        port_scan(ip,port)
-</code></pre><p>结果：</p>
-<pre><code>[+] port:80     open     http
-</code></pre><p>####程序分析：</p>
-<pre><code>getservbyport(port)函数，获取对应端口所运行的的服务
-
-map()函数的用法：
-
-    map(f, iterable) 基本上等于：[f(x) for x in iterable]
-
-map()函数案例
-
-    &gt;&gt;&gt; def add100(x):
-    ...     return x + 100
-    ... 
-    &gt;&gt;&gt; list1 = [11,22,33]
-    &gt;&gt;&gt; map(add100,list1)
-    [101, 102, 103]
-
-    &gt;&gt;&gt; [add100(i) for i in list1]
-    [101, 102, 103]
-</code></pre><h3 id="port-3-py"><a href="#port-3-py" class="headerlink" title="port_3.py"></a>port_3.py</h3><pre><code>import urllib
-import socket
-ip=&apos;192.168.16.136&apos;
-default_ports=[80,21,22,3389,1433]
-def port_scan(ip,port):
-    try:
-        socket.setdefaulttimeout(3)
-        s=socket.socket()
-        s.connect((ip,port))
-        s.send(&apos;aaa\r\n&apos;)
-        res=s.recv(40)
-        print &apos;[+] port:%d\t open \t%s&apos;%(port,res)
-        s.close()#关闭套接字
-    except:
-        pass
-if __name__ == &apos;__main__&apos;:
-    map(port_scan,[ip]*len(default_ports),default_ports)
-</code></pre><p>结果：</p>
-<pre><code>[+] port:80     open     &lt;?xml version=&quot;1.0&quot; encoding=&quot;iso-8859-1
-</code></pre><p>发送数据，并且接收到一些数据，</p>
-<h3 id="port-4-py"><a href="#port-4-py" class="headerlink" title="port_4.py"></a>port_4.py</h3><pre><code>#!usr/bin/env python 
-#-*- coding:utf_8 -*-
-import urllib
-
-import socket,threading
-ip=&apos;192.168.16.136&apos;
-default_ports=[21,22,80,1433,3306]
-
-lock=threading.Semaphore(value=1)
-def port_scan(ip,port):
-    try:
-        socket.setdefaulttimeout(3)
-        s=socket.socket()
-        s.connect((ip,port))
-        s.send(&apos;dream9\r\n&apos;)
-        res=s.recv(40)
-        lock.acquire()
-        print &apos;[+] port:%d\topen\t%s&apos; % (port,res)
-        lock.release()
-        s.close()
-    except:
-        pass
-
-if __name__==&apos;__main__&apos;:
-    for port in default_ports:
-        t=threading.Thread(target=port_scan,args=(ip,port))
-        t.start()
-</code></pre><p>####程序分析：</p>
-<pre><code>lock=threading.Semaphore(value=1)
-</code></pre><p>信号机semaphore()每次有一个线程获取信号机，计数器为-1，如果为0，则其他线程就体制访问信号机，直到开始那个哪个线程释放信号机</p>
-<pre><code>lock.acquire(): 调用acquire()时-1
-
-lock.release(): 释放Semaphore，将计数器+1
-
-thread.exit(）线程结束
-</code></pre><p>详细请见：<a href="https://www.t00ls.net/thread-32735-1-1.html" target="_blank" rel="external">Hacking By Python—端口扫描1</a></p>
-
       
     </div>
+    
+    <footer>
+      <div class="alignleft">
+        <a href="/2016/06/10/python_端口扫描小工具/#more" class="more-link">More</a>
+      </div>
+    </footer>
     
     <footer>
         <div class="alignright">
@@ -709,7 +600,7 @@ thread.exit(）线程结束
 <nav id="pagination">
   
   <nav id="page-nav">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/">Siguiente &raquo;</a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/">Nächste Seite &raquo;</a>
   </nav>
 
 </nav>
