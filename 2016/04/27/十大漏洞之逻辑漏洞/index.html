@@ -1,0 +1,433 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8" />
+  
+  <title>十大漏洞之逻辑漏洞 | lazy</title>
+  <meta name="author" content="lazy" />
+
+  
+  <meta name="description" content="在十大漏洞中，逻辑漏洞被称为“不安全的对象引用，和功能级访问控制缺失”。现如今，越权和逻辑漏洞占用比例比较高，包括任意查询用户信息，重置任意用户密码，验证码爆破等。" />
+  
+
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+
+  <meta property="og:title" content="十大漏洞之逻辑漏洞" />
+  <meta property="og:site_name" content="lazy" />
+
+  
+  
+  
+  
+  
+
+  
+    <meta property="og:image" content="undefined" />
+  
+
+  
+  <link href="/css/images/favicon.ico" rel="icon" />
+  
+
+  <link rel="alternate" href="/atom.xml" title="lazy" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+
+  <!-- baidu webmaster push -->
+  <script src='//push.zhanzhang.baidu.com/push.js'></script>
+
+</head>
+
+
+<body>
+  <header id="header" class="inner"><div class="alignleft">
+  <h1><a href="/">lazy</a></h1>
+  <h2><a href="/"></a></h2>
+</div>
+<nav id="main-nav" class="alignright">
+  <ul>
+    
+      <li><a href="/">主页</a></li>
+    
+      <li><a href="/achieve">所有文章</a></li>
+    
+      <li><a href="/plan">学习计划</a></li>
+    
+      <li><a href="/developer">开发者</a></li>
+    
+      <li><a href="/about">关于</a></li>
+    
+      <li><a href="http://www.cnblogs.com/lazy0">aother blog</a></li>
+    
+  </ul>
+  <div class="clearfix"></div>
+</nav>
+<div class="clearfix"></div></header>
+  <div id="content" class="inner">
+    <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2016-04-27T15:26:36.000Z"><a href="/2016/04/27/十大漏洞之逻辑漏洞/">2016-04-27</a></time>
+      
+      
+  
+    <h1 class="title">十大漏洞之逻辑漏洞</h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <p>在十大漏洞中，逻辑漏洞被称为“不安全的对象引用，和功能级访问控制缺失”。现如今，越权和逻辑漏洞占用比例比较高，包括任意查询用户信息，重置任意用户密码，验证码爆破等。<a id="more"></a></p>
+<h2 id="逻辑漏洞："><a href="#逻辑漏洞：" class="headerlink" title="逻辑漏洞："></a>逻辑漏洞：</h2><hr>
+<p>常见的逻辑漏洞：</p>
+<pre><code>交易支付，密码修改，密码找回，越权修改，越权查询，，突破限制等各种逻辑漏洞
+</code></pre><p><a href="">不安全的对象引用指的是平行权限的访问控制缺失</a></p>
+<pre><code>A,B同为普通用户，他们之间彼此之间的个人资料应该相互保密的，
+
+A的资料如果被B用户利用程序访问控制的缺失而已查看，这就是平行权限的关系。
+</code></pre><p><a href="">功能级别访问控制缺失指的是垂直权限的访问控制缺失</a></p>
+<pre><code>A是普通用户，B是管理员，B的页面登录访问需要密码和token.
+
+A账号能直接输入管理页面URL的方式绕过管理员登录限制查看管理员页面，这个时候A,B就是垂直关系。
+</code></pre><h2 id="逻辑漏洞的挖掘："><a href="#逻辑漏洞的挖掘：" class="headerlink" title="逻辑漏洞的挖掘："></a>逻辑漏洞的挖掘：</h2><hr>
+<p>基本步骤:</p>
+<pre><code>1，先尝试正确操作流程，记录不同找回方式的所有数据包
+
+2，分析数据包，找到有效数据部分
+
+3，推测数据构造方法
+
+4，构造数据包验证猜测
+</code></pre><p>比如说，加入购物车，我是不是可以修改购买的数量，修改成负数，商品的价格是不是可以修改；</p>
+<p>确认购物车信息时，是不是可以修改商品的数量为负数，是不是可以突破打折的限制；</p>
+<p>输入运费，可不可以被修改；</p>
+<p>确认订单后，能不能直接修改支付金额，可否不支付直接跳转到交易成功；</p>
+<h2 id="逻辑漏洞的利用："><a href="#逻辑漏洞的利用：" class="headerlink" title="逻辑漏洞的利用："></a>逻辑漏洞的利用：</h2><hr>
+<h3 id="用户凭证暴力破解："><a href="#用户凭证暴力破解：" class="headerlink" title="用户凭证暴力破解："></a>用户凭证暴力破解：</h3><hr>
+<p>四位或者六位的纯数字，无需验证码，直接burp爆破；</p>
+<p>四位或者六位的纯数字，需要验证码，但是验证码没有及时撤销，也可以直接burp爆破；</p>
+<p>四位或者六位的纯数字，需要验证码，但是验证码没有及时撤销，也可以直接burp爆破；</p>
+<p>如果验证不是很验过，burp抓包，在后面手机号后面添加特殊字符绕过第一次防御</p>
+<pre><code>防御----对它提交的次数做一个过滤
+
+防御----只要尝试超过三次，就加入黑名单
+</code></pre><h3 id="返回凭证："><a href="#返回凭证：" class="headerlink" title="返回凭证："></a>返回凭证：</h3><hr>
+<p>burp抓包的时候，url返回验证码及token，时间戳的md5，修改token为1或0，绕过凭证。</p>
+<h3 id="密码找回漏洞："><a href="#密码找回漏洞：" class="headerlink" title="密码找回漏洞："></a>密码找回漏洞：</h3><hr>
+<p>大纲如下图所示：</p>
+<p><img src="http://7xp4iw.com1.z0.glb.clouddn.com/luoji%27.png" alt=""></p>
+<p><a href="">一般都是通过验证问题，验证邮箱，验证手机号码，等操作进行找回。</a></p>
+<p>基本步骤:</p>
+<pre><code>* 先尝试正确的密码找回流程，记录不同找回方式的所有数据包
+
+* 分析数据包，找到有效数据部分
+
+* 推测数据构造方法
+
+* 构造数据包验证猜测
+</code></pre><p><a href="">简单案例：</a></p>
+<p>1，邮箱验证：</p>
+<pre><code>一般是点击邮件中的链接后会转跳到修密码的页面，这就需要分析链接的token构造了，
+
+可以考虑是时间戳md5、用户名或邮箱和随机字符串md5等，一般是类似如下链接：
+
+php?u=xiaoming&amp;token=MTIzQHFxLmNvbQ==
+
+php?id=374&amp;token=2ad64bf14c714dbce88c7993663da7da
+
+当构造相应链接时就可以重置任意用户的密码
+</code></pre><p>2，手机短信验证：</p>
+<pre><code>短信找回一般就是4位或6位验证码，暴力猜测吧
+</code></pre><p>3，无需验证，直接修改：</p>
+<pre><code>在修改密码时跳过选择找回方式，直接访问修改密码的页面进行修改
+</code></pre><p>4，本地验证：</p>
+<pre><code>随意输入一个验证码，开Burp抓包，forward，抓返回包，返回包里可能有一个token字段，
+若token的值为1则跳转到修改密码页面，所以只要修改返回包即可
+</code></pre><p>5，服务端将验证码返回给浏览器：</p>
+<pre><code>在点击获取验证码时，服务器会将验证码发送给浏览器，抓包即可
+</code></pre><p>6，验证码直接出现在url中：</p>
+<pre><code>当点击获取验证码时发出的请求链接中直接有code,或者直接在源代码里面。
+</code></pre><p>7，密保问题找回：</p>
+<pre><code>回答密保问题，有时一些答案就在html源码里
+</code></pre><p>8，找回逻辑错误：</p>
+<pre><code>若恶意用户A用15123333333找回密码，此时收到验证码但不使用
+此时恶意用户A再用受害者B的手机号找回密码
+用户A在B的验证表单填入自己收到的验证码，发送
+此时跳转的修改密码页面修改的就是用户B的密码
+</code></pre><p>9，无需旧密码验证：</p>
+<pre><code>修改密码，发现不需要输入原来的旧密码，直接设置新的密码，
+
+这个时候就直接存在了csrf漏洞，构造链接，直接就修改了
+
+php?token=2&amp;username=test&amp;password=tst
+</code></pre><h3 id="支付漏洞："><a href="#支付漏洞：" class="headerlink" title="支付漏洞："></a>支付漏洞：</h3><hr>
+<p><a href="">攻击者通过修改交易金额、交易数量等从而利用漏洞，如Burp修改交易金额、使交易数量为负数或无限大等。</a></p>
+<p>1、支付过程中可直接修改数据包中的支付金额</p>
+<pre><code>金额后端没有做校验，传递过程中也没有做签名，导致可以随意篡改金额提交。
+</code></pre><p>2、没有对购买数量进行负数限制，购买数量无限大，</p>
+<pre><code>无限大时则程序可能处理出错，从而实现0金额支付
+</code></pre><p>3、请求重放，实现”一次购买对此收货”</p>
+<p>4、其他参数干扰</p>
+<pre><code>在支付时直接修改数据包中的支付金额，实现小金额购买大金额商品
+
+修改购买数量，使之为负数，可购买负数量商品，从而扣除负积分，即增加积分，
+
+或使购买数量无限大，无限大时则程序可能处理出错，从而实现0金额支付
+
+请求重放，在购买成功后重放请求，可实现&quot;一次购买对此收货&quot;
+</code></pre><h2 id="基本案例："><a href="#基本案例：" class="headerlink" title="基本案例："></a>基本案例：</h2><hr>
+<p><a href="">案例1</a></p>
+<p>会员注册用户：</p>
+<pre><code>test
+test
+验证码0566
+
+登录密码没有验证码，可以直接暴力破解用户名和密码
+
+因为服务端没有及时销毁，就可以使用burp批量注册
+
+每个参数多可能存在逻辑漏洞，修改参数，看能不能提交成功。
+
+burp发送到爆破，变量，username,password，email
+
+然后加载3个字典，批量注册了，有木有，发现响应都是200,证明存在这个漏洞
+
+这个时候所有的用户都可以登陆
+</code></pre><p>修改密码：</p>
+<pre><code>1234567
+1234567
+
+拦截数据包，查看参数值，发现当我们把用户修改成别人的，然后可以修改成功，这个时候越权漏洞就产生了。
+</code></pre><p>投票系统：</p>
+<pre><code>我们抓包，删除cookie信息，或者是ip地址判断的
+
+然后使用burp跑字典
+</code></pre><p><a href="">案例二</a></p>
+<pre><code>后台地址，访问，提示不能直接访问，查看源代码，发现后台是referer判断，
+
+这个容易绕过，burp抓包，然后进到了后台页面，
+
+然后找到数据备份，找到referer,
+
+然后普通用户，添加referer伪造地址，
+
+接着看到了script限制，我们使用chrome,不允许script，然后重新访问
+
+就直接突破了，这个不能使用firebox
+</code></pre><p>参数越权</p>
+<pre><code>地址管理处，修改任意收获信息，造成敏感信息泄露
+
+地址管理---修改---burp抓到数据包get链接---有一个address_id,是收货人的地址对应的id--将参数替换成任意值---这个时候发现收货人的地址发生改变了，修改了收货人的信息了。
+
+建议是，对用户修改以及查看地址进行权限校验，避免越权操作，如果越权，直接错误页面你，或者账户退出
+
+
+注册一个账号，邮箱需要激活才能登陆---点击重新发送-burp抓包，在uid处，修改参数值，可以发送邮箱炸弹。
+</code></pre><p>修复建议：</p>
+<pre><code>对激活邮件限制发送次数
+</code></pre><p>越权其他用户信息:</p>
+<pre><code>登录抓取cookie信息，有手机号码在Cookie
+
+这个时候，我们修改cookie中的手机号，查看其他用户的信息
+</code></pre><p>参数越权:</p>
+<pre><code>直接访问一个页面，能看到其他用户的订单号
+
+注册工程中，返回全部用户的注册信息
+
+当我用别人邮箱注册的时候，爆出来了别人的信息，
+
+我们只需要别人的用户，就可以了
+</code></pre><p>服务费的绕过:</p>
+<pre><code>点击还款，然后get抓包，修改参数，为0或者1，就直接绕过，还款成功。
+
+积分数值允许喂负数
+</code></pre>
+      
+    </div>
+    
+    <footer>
+        <div class="alignright">
+          
+          <a href='javascript:void(0)' class="share-link bdsharebuttonbox" data-cmd="more">分享</a>
+        </div>
+        
+  
+  <div class="categories">
+    <a href="/categories/十大漏洞/">十大漏洞</a>
+  </div>
+
+        
+  
+  <div class="tags">
+    <a href="/tags/渗透测试/">渗透测试</a>, <a href="/tags/逻辑漏洞/">逻辑漏洞</a>
+  </div>
+
+        <!-- partial('post/share') -->
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+</div></div>
+    <aside id="sidebar" class="alignright">
+  <div class="widget tag">
+    <h3 class="title">关于文章</h3>
+    <div class="entry">
+    <P>文章有问题可以发邮件</p>
+    <p>大家彼此相互学习</p>
+      <p>邮箱：lazy@dropsec.xyz</p>
+    </div>
+</div>
+
+  <div class="widget tag">
+    <h3 class="title">赞助我</h3>
+    <div class="entry">
+      <img src='/css/images/qr_alipay.png' style='width:100%;background:rgba(255,255,255,0.6)' />
+    </div>
+</div>
+
+  
+<div class="widget tagcloud">
+  <h3 class="title">标签云</h3>
+  <div class="entry">
+    <a href="/tags/CSRF/" style="font-size: 10px;">CSRF</a> <a href="/tags/MarkDown/" style="font-size: 10px;">MarkDown</a> <a href="/tags/hexo/" style="font-size: 20px;">hexo</a> <a href="/tags/json/" style="font-size: 10px;">json</a> <a href="/tags/python/" style="font-size: 20px;">python</a> <a href="/tags/sql注入，手工/" style="font-size: 10px;">sql注入，手工</a> <a href="/tags/sql注入，过狗，过waf/" style="font-size: 10px;">sql注入，过狗，过waf</a> <a href="/tags/上传绕过/" style="font-size: 15px;">上传绕过</a> <a href="/tags/正则表达式/" style="font-size: 10px;">正则表达式</a> <a href="/tags/渗透测试/" style="font-size: 20px;">渗透测试</a> <a href="/tags/渗透测试，命令执行/" style="font-size: 10px;">渗透测试，命令执行</a> <a href="/tags/脚本/" style="font-size: 10px;">脚本</a> <a href="/tags/过waf，过狗/" style="font-size: 10px;">过waf，过狗</a> <a href="/tags/逻辑漏洞/" style="font-size: 10px;">逻辑漏洞</a>
+  </div>
+</div>
+
+
+  
+  <div class="widget tag">
+    <h3 class="title">归档</h3>
+    <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archive/2016/06/">    2016年06月</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archive/2016/05/">    2016年05月</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archive/2016/04/">    2016年04月</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archive/2015/06/">    2015年06月</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archive/2015/05/">    2015年05月</a><span class="archive-list-count">4</span></li></ul>
+  </div>
+
+
+  
+<div class="widget tag">
+  <h3 class="title">分类</h3>
+  <ul class="entry">
+  
+    <li><a href="/categories/python/">python</a><small>3</small></li>
+  
+    <li><a href="/categories/十大漏洞/">十大漏洞</a><small>4</small></li>
+  
+    <li><a href="/categories/杂谈/">杂谈</a><small>4</small></li>
+  
+    <li><a href="/categories/渗透测试/">渗透测试</a><small>3</small></li>
+  
+  </ul>
+</div>
+
+
+  
+<div class="widget tag">
+  <h3 class="title">近期文章</h3>
+  <ul class="entry">
+    
+      <li>
+        <a href="/2016/06/10/python_端口扫描小工具/">python_端口扫描小工具</a>
+      </li>
+    
+      <li>
+        <a href="/2016/06/07/phpcms_2008远程代码执行漏洞/">phpcms-2008 远程代码执行漏洞</a>
+      </li>
+    
+      <li>
+        <a href="/2016/05/30/python_json模块/">python之json模块</a>
+      </li>
+    
+      <li>
+        <a href="/2016/05/27/python正则表达式/">python之正则表达式</a>
+      </li>
+    
+      <li>
+        <a href="/2016/04/28/十大漏洞之远程命令执行/">十大漏洞之命令执行</a>
+      </li>
+    
+  </ul>
+</div>
+
+
+  <div class="widget tag">
+  <h3 class="title">友情链接</h3>
+  <div class="entry">
+    <ul>
+<!-- link start -->
+<li><a href='http://www.cnblogs.com/lazy0'>lazy</a></li>
+<li><a href='http://www.baidu.com'>baidu</a></li>
+<!-- link  end -->
+    </ul>
+  </div>
+</div>
+
+
+  <div class="widget tag">
+    <h3 class="title">统计</h3>
+    <div class="entry">
+      
+	<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1260064002'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s4.cnzz.com/z_stat.php%3Fid%3D1260064002' type='text/javascript'%3E%3C/script%3E"));</script>
+
+
+
+
+    </div>
+</div>
+
+</aside>
+    <div class="clearfix"></div>
+  </div>
+  <footer id="footer" class="inner"><script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+<div class="alignleft">
+<span id="busuanzi_container_site_pv">
+    你好，你是第:<span id="busuanzi_value_site_pv"></span>位访客
+</span>
+</div>
+
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1260064002'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s4.cnzz.com/z_stat.php%3Fid%3D1260064002' type='text/javascript'%3E%3C/script%3E"));</script>
+
+
+
+</footer>
+  <script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+
+
+<script>
+    //Kill XP and IE8
+    (function(){
+        var ua = navigator.userAgent;
+        var res = /Windows NT (\d+\.\d+)/.exec(ua);
+        var xpOrLower = res && JSON.parse(res[1]) < 6;
+        res = /MSIE (\d+\.\d+)/.exec(ua);
+        var ie8OrLower = res && JSON.parse(res[1]) < 9;
+        if(xpOrLower || ie8OrLower)
+        {
+            alert('请不要用XP及之前的Windows系统，和IE8及之前的IE浏览器访问本站！');
+            location.href = "about:blank";
+        }
+        var fromBaiduSE = /^https?:\/\/www.baidu.com/.test(document.referrer);
+        if(fromBaiduSE)
+        {
+            alert('检测到你还在使用百度搜索，作为一个程序员，这是一种自暴自弃！\n\n做不作恶的程序员，从不用百度开始！')
+            location.href = "about:blank";
+        }
+    })();
+</script>
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1260064002'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s4.cnzz.com/z_stat.php%3Fid%3D1260064002' type='text/javascript'%3E%3C/script%3E"));</script> 
+//前面要添加的代码  
+//百度统计的代码  
+
+<div id='bg'></div>
+</body>
+</html>
