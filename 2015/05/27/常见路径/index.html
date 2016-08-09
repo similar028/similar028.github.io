@@ -3,16 +3,18 @@
 <head>
   <meta charset="utf-8" />
   
-  <title>常见路径 | lazy</title>
+  <title>漏洞利用的常见路径 | lazy</title>
   <meta name="author" content="lazy" />
 
+  
+  <meta name="description" content="常见的一些路径" />
   
 
   
 
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
 
-  
+  <meta property="og:title" content="漏洞利用的常见路径" />
   <meta property="og:site_name" content="lazy" />
 
   
@@ -65,25 +67,141 @@
 </nav>
 <div class="clearfix"></div></header>
   <div id="content" class="inner">
-    <div id="main-col" class="alignleft"><div id="wrapper">
-<h2 class="archive-title tag">常见路径</h2>
+    <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2015-05-27T05:26:36.000Z"><a href="/2015/05/27/常见路径/">2015-05-27</a></time>
+      
+      
+  
+    <h1 class="title">漏洞利用的常见路径</h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <p>常见的一些路径</p>
+<a id="more"></a>
+<pre><code>load_file() 常用路径：
 
 
-  <div class="archive">
+　　1、 replace(load_file(0×2F6574632F706173737764),0×3c,0×20)
+　　2、replace(load_file(char(47,101,116,99,47,112,97,115,115,119,100)),char(60),char(32))
+　　上面两个是查看一个PHP文件里完全显示代码.有些时候不替换一些字符,如 “&lt;” 替换成”空格” 返回的是网页.而无法查看到代码.
+　　3、 load_file(char(47)) 可以列出FreeBSD,Sunos系统根目录
+　　4、/etc tpd/conf tpd.conf或/usr/local/apche/conf tpd.conf 查看linux APACHE虚拟主机配置文件
+　　5、c:\Program Files\Apache Group\Apache\conf \httpd.conf 或C:\apache\conf \httpd.conf 查看WINDOWS系统apache文件
+　　6、c:/Resin-3.0.14/conf/resin.conf 查看jsp开发的网站 resin文件配置信息.
+　　7、c:/Resin/conf/resin.conf /usr/local/resin/conf/resin.conf 查看linux系统配置的JSP虚拟主机
+　　8、d:\APACHE\Apache2\conf\httpd.conf
+　　9、C:\Program Files\mysql\my.ini
+　　10、../themes/darkblue_orange/layout.inc.php phpmyadmin 爆路径
+　　11、 c:\windows\system32\inetsrv\MetaBase.xml 查看IIS的虚拟主机配置文件
+　　12、 /usr/local/resin-3.0.22/conf/resin.conf 针对3.0.22的RESIN配置文件查看
+　　13、 /usr/local/resin-pro-3.0.22/conf/resin.conf 同上
+　　14 、/usr/local/app/apache2/conf/extra tpd-vhosts.conf APASHE虚拟主机查看
+　　15、 /etc/sysconfig/iptables 本看防火墙策略
+　　16 、 usr/local/app/php5 b/php.ini PHP 的相当设置
+　　17 、/etc/my.cnf MYSQL的配置文件
+　　18、 /etc/redhat-release 红帽子的系统版本
+　　19 、C:\mysql\data\mysql\user.MYD 存在MYSQL系统中的用户密码
+　　20、/etc/sysconfig/network-scripts/ifcfg-eth0 查看IP.
+　　21、/usr/local/app/php5 b/php.ini //PHP相关设置
+　　22、/usr/local/app/apache2/conf/extra tpd-vhosts.conf //虚拟网站设置
+　　23、C:\Program Files\RhinoSoft.com\Serv-U\ServUDaemon.ini
+　　24、c:\windows\my.ini
+    25、c:\boot.ini
+
+网站常用配置文件 config.inc.php、config.php。load_file（）时要用replace（load_file(HEX)，char(60),char(32)）
+
+
+
+WINDOWS下:
+c:/boot.ini //查看系统版本
+c:/windows/php.ini //php配置信息
+c:/windows/my.ini //MYSQL配置文件，记录管理员登陆过的MYSQL用户名和密码
+c:/winnt/php.ini
+c:/winnt/my.ini
+c:\mysql\data\mysql\user.MYD //存储了mysql.user表中的数据库连接密码
+c:\Program Files\RhinoSoft.com\Serv-U\ServUDaemon.ini //存储了虚拟主机网
+站路径和密码
+c:\Program Files\Serv-U\ServUDaemon.ini
+c:\windows\system32\inetsrv\MetaBase.xml //IIS配置文件
+c:\windows\repair\sam //存储了WINDOWS系统初次安装的密码
+c:\Program Files\ Serv-U\ServUAdmin.exe //6.0版本以前的serv-u管理员密码
+存储于此
+c:\Program Files\RhinoSoft.com\ServUDaemon.exe
+C:\Documents and Settings\All Users\Application Data\Symantec\pcAnywhere
+\*.cif文件
+//存储了pcAnywhere的登陆密码
+c:\Program Files\Apache Group\Apache\conf \httpd.conf 或C:\apache\conf
+\httpd.conf //查看 WINDOWS系统apache文件
+c:/Resin-3.0.14/conf/resin.conf //查看jsp开发的网站 resin文件配置信息.
+c:/Resin/conf/resin.conf /usr/local/resin/conf/resin.conf 查看linux系统
+配置的JSP虚拟主机
+d:\APACHE\Apache2\conf\httpd.conf
+C:\Program Files\mysql\my.ini
+c:\windows\system32\inetsrv\MetaBase.xml 查看IIS的虚拟主机配置
+C:\mysql\data\mysql\user.MYD 存在MYSQL系统中的用户密码
+LUNIX/UNIX下:
+
+/usr/local/app/apache2/conf/httpd.conf //apache2缺省配置文件
+/usr/local/apache2/conf/httpd.conf
+/usr/local/app/apache2/conf/extra/httpd-vhosts.conf //虚拟网站设置
+/usr/local/app/php5/lib/php.ini //PHP相关设置
+/etc/sysconfig/iptables //从中得到防火墙规则策略
+/etc/httpd/conf/httpd.conf // apache配置文件
+/etc/rsyncd.conf //同步程序配置文件
+/etc/my.cnf //mysql的配置文件
+
+/etc/redhat-release //系统版本
+/etc/issue
+/etc/issue.net
+/usr/local/app/php5/lib/php.ini //PHP相关设置
+/usr/local/app/apache2/conf/extra/httpd-vhosts.conf //虚拟网站设置
+/etc/httpd/conf/httpd.conf或/usr/local/apche/conf/httpd.conf 查看linux
+APACHE虚拟主机配置文件
+/usr/local/resin-3.0.22/conf/resin.conf 针对3.0.22的RESIN配置文件查看
+/usr/local/resin-pro-3.0.22/conf/resin.conf 同上
+/usr/local/app/apache2/conf/extra/httpd-vhosts.conf APASHE虚拟主机查看
+/etc/httpd/conf/httpd.conf或/usr/local/apche/conf/httpd.conf 查看linux
+APACHE虚拟主机配置文件
+/usr/local/resin-3.0.22/conf/resin.conf 针对3.0.22的RESIN配置文件查看
+/usr/local/resin-pro-3.0.22/conf/resin.conf 同上
+/usr/local/app/apache2/conf/extra/httpd-vhosts.conf APASHE虚拟主机查看
+/etc/sysconfig/iptables 查看防火墙策略
+</code></pre>
+      
+    </div>
     
-      <article class="post">
-        <div class="post-content">
-          <header>
-            <div class="icon"></div>
-            <time datetime="2015-05-27T05:26:36.000Z"><a href="/2015/05/27/常见路径/">2015-05-27</a></time>
-            
-              <h1 class="title"><a href="/2015/05/27/常见路径/">漏洞利用的常见路径</a></h1>
-            
-          </header>
+    <footer>
+        <div class="alignright">
+          
+          <a href='javascript:void(0)' class="share-link bdsharebuttonbox" data-cmd="more">分享</a>
         </div>
-      </article>
-    
+        
+  
+  <div class="categories">
+    <a href="/categories/渗透测试/">渗透测试</a>
   </div>
+
+        
+  
+  <div class="tags">
+    <a href="/tags/常见路径/">常见路径</a>
+  </div>
+
+        <!-- partial('post/share') -->
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
 </div></div>
     <aside id="sidebar" class="alignright">
   <div class="widget tag">
